@@ -2256,7 +2256,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
         &lt;h1&gt;San Diego&lt;em&gt;Lap Time Analysis&lt;/em&gt;&lt;/h1&gt;
       &lt;/div&gt;
       &lt;div class=&quot;header-stats&quot;&gt;
-        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-sessions&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-sessions&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-laps&quot;&gt;—&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Valid Laps&lt;/div&gt;&lt;/div&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; style=&quot;color:var(--accent)&quot; id=&quot;stat-best&quot;&gt;131.13&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Best Lap · Clean&lt;/div&gt;&lt;/div&gt;
       &lt;/div&gt;
@@ -4547,6 +4547,51 @@ const SESSIONS = [
     &quot;comment&quot;: &quot;Front and rear balance was more synced up.&quot;
    }
   ]
+ },
+ {
+  &quot;id&quot;: &quot;20260616_NOS_SAN_JGR18_DS&quot;,
+  &quot;driver&quot;: &quot;William Sawalich&quot;,
+  &quot;car&quot;: &quot;JGR18&quot;,
+  &quot;date&quot;: &quot;Jun 16&quot;,
+  &quot;dateSort&quot;: 20260616,
+  &quot;track&quot;: &quot;SanDiego_v102&quot;,
+  &quot;sim&quot;: &quot;GT12&quot;,
+  &quot;tire&quot;: &quot;25CSC1_o05&quot;,
+  &quot;totalLaps&quot;: 13,
+  &quot;note&quot;: null,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;18C Unload Setup&quot;,
+    &quot;avg1&quot;: 132.17,
+    &quot;avg2&quot;: 132.41,
+    &quot;laps&quot;: 9,
+    &quot;times&quot;: [
+     134.11,
+     135.75,
+     135.27,
+     132.19,
+     132.73,
+     132.83,
+     132.24,
+     132.08
+    ],
+    &quot;comment&quot;: &quot;This feels different from GTX.&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;Rerun R01&quot;,
+    &quot;avg1&quot;: 132.27,
+    &quot;avg2&quot;: 132.27,
+    &quot;laps&quot;: 4,
+    &quot;times&quot;: [
+     132.48,
+     132.41,
+     131.93
+    ],
+    &quot;comment&quot;: &quot;&quot;
+   }
+  ]
  }
 ];
 
@@ -5201,7 +5246,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
         &lt;h1&gt;Sonoma&lt;em&gt;Lap Time Analysis&lt;/em&gt;&lt;/h1&gt;
       &lt;/div&gt;
       &lt;div class=&quot;header-stats&quot;&gt;
-        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-sessions&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-sessions&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-laps&quot;&gt;—&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Valid Laps&lt;/div&gt;&lt;/div&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; style=&quot;color:var(--accent)&quot; id=&quot;stat-best&quot;&gt;76.17&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Best Lap · Clean&lt;/div&gt;&lt;/div&gt;
       &lt;/div&gt;
@@ -5264,83 +5309,750 @@ const OUTLIER = 90; // laps at/above this are excluded — Sonoma clean pace ~77
    times[] (individual out laps as printed), comment.
    Outlier laps &gt;=OUTLIER (90s) are excluded from valid counts and bests. */
 const SESSIONS = [
-  {
-    id:&#x27;20260602_NOS_SON_JGR19_DS&#x27;, driver:&#x27;Brent Crews&#x27;, car:&#x27;JGR19&#x27;,
-    date:&#x27;Jun 2&#x27;, dateSort:20260602, track:&#x27;Sonoma_v2302&#x27;, sim:&#x27;GT12&#x27;, tire:&#x27;25Son1_o06&#x27;, totalLaps:21,
-    runs:[
-      {no:1, desc:&#x27;2026 SON 19 Car 25Son Race 4TFG L15&#x27;, avg1:135.50, avg2:135.50, laps:3, times:[129.45,141.55], comment:&#x27;Balance feels good though, feel like I would want more drive — need to see what it does to the fast right.&#x27;},
-      {no:2, desc:&#x27;Rerun R01 · Load Soft Saturations&#x27;, avg1:77.82, avg2:77.82, laps:3, times:[78.18,77.45], comment:&#x27;Need more drive out of the last corner and T4/7 tight rights. Feels pretty close — not enough drive in T4/7/11.&#x27;},
-      {no:3, desc:&#x27;R02 + RS Truck Arm&#x27;, avg1:77.39, avg2:77.39, laps:3, times:[77.42,77.35], comment:&#x27;Really really tight, loss everywhere. Super snappy loose the second I released wheel — had so much wheel in it. Felt lazy through the esses.&#x27;},
-      {no:4, desc:&#x27;Rerun R02&#x27;, avg1:76.92, avg2:76.92, laps:2, times:[76.92], comment:&#x27;Most positive turn I have had yet. Could use a little better cut in the high speed stuff and a little more drive in the slow speed stuff.&#x27;},
-      {no:5, desc:&#x27;R03 + 350 Rears&#x27;, avg1:77.33, avg2:77.33, laps:3, times:[77.36,77.30], comment:&#x27;Good cut, could not carry a lot of lateral grip. Back-and-forth direction was super fast — rear could not hold onto it.&#x27;},
-      {no:6, desc:&#x27;R04 + TB Down 0.25&quot;&#x27;, avg1:78.25, avg2:78.25, laps:2, times:[78.25], comment:&#x27;&#x27;},
-      {no:7, desc:&#x27;Rerun R06&#x27;, avg1:77.31, avg2:77.31, laps:3, times:[77.58,77.04], comment:&#x27;Second favorite, lacks entry stability in the fast corners. Gets free in the downhill-left and anywhere a constant radius tightens up.&#x27;},
-      {no:8, desc:&#x27;R05 + Linear Fronts + 0.1 NW&#x27;, avg1:76.86, avg2:76.86, laps:2, times:[76.86], comment:&#x27;Better — feel like I have no rear tracking. Front could be better, just feels like the rear is out of the track.&#x27;}
-    ]
-  },
-  {
-    id:&#x27;20260609_NOS_SON_JGR54_DS&#x27;, driver:&#x27;Taylor Gray&#x27;, car:&#x27;JGR54&#x27;,
-    date:&#x27;Jun 9&#x27;, dateSort:20260609, track:&#x27;Sonoma_v2302&#x27;, sim:&#x27;GT12&#x27;, tire:&#x27;25Son1_o06&#x27;, totalLaps:21,
-    runs:[
-      {no:1, desc:&#x27;54 car L42&#x27;, avg1:77.43, avg2:77.52, laps:13, times:[78.97,78.78,78.09,78.37,77.82,77.95,77.76,77.57,77.48,77.77,77.45,77.35], comment:&#x27;Feels pretty good, honestly. Maybe a little snug — up the hill to the switchback to two. Overall pretty close. Curbs felt really realistic.&#x27;},
-      {no:2, desc:&#x27;18b start race&#x27;, avg1:77.30, avg2:77.38, laps:8, times:[77.97,77.65,115.88,77.36,77.23,77.30,77.36], comment:&#x27;On the splitter under braking on the downhill right-hander — get really tight there. More prone to lock up with this setup, and a little tighter in the high-speed stuff.&#x27;}
-    ]
-  },
-  {
-    id:&#x27;20260611_NOS_SON_JGR54_DS&#x27;, driver:&#x27;Taylor Gray&#x27;, car:&#x27;JGR54&#x27;,
-    date:&#x27;Jun 11&#x27;, dateSort:20260611, track:&#x27;Sonoma_v2302&#x27;, sim:&#x27;GT12&#x27;, tire:&#x27;25Son1_o06&#x27;, totalLaps:63,
-    runs:[
-      {no:1, desc:&#x27;25SON1 54b L42 setup&#x27;, avg1:76.82, avg2:76.98, laps:10, times:[77.50,78.28,76.94,77.51,77.29,76.56,76.96,77.13,77.80], comment:&quot;Balance isn&#x27;t bad. Probably a little snug through the slow-speed stuff. High-speed stuff I&#x27;m pretty good at.&quot;},
-      {no:2, desc:&#x27;26SON1 54b AB1&#x27;, avg1:76.91, avg2:76.96, laps:8, times:[77.05,76.92,77.03,76.96,77.17,77.18,76.86], comment:&quot;Similar to last run. Snug in T2 up the hill turning right; need more positive front rotation switching from loading right-rear to left-rear. Good through the fast kink.&quot;},
-      {no:3, desc:&#x27;25SON1 18b start race&#x27;, avg1:77.00, avg2:77.18, laps:8, times:[77.44,78.17,77.17,77.56,77.45,76.89,76.93], comment:&quot;Not much there. Still need to turn better in the same areas — lost some lateral grip and got the hiders through the fast kink on the backstretch.&quot;},
-      {no:4, desc:&#x27;26SON1 54b AB1 + RS truck arm to top hole&#x27;, avg1:77.33, avg2:77.40, laps:5, times:[77.38,77.43,77.61,77.19], comment:&quot;A little better — felt more of a change, right direction. Could use a bit more front. Starting to get the back too loose, losing overall rear drive.&quot;},
-      {no:5, desc:&#x27;Rerun Run 2&#x27;, avg1:76.73, avg2:76.73, laps:2, times:[76.73], comment:&#x27;&#x27;},
-      {no:6, desc:&#x27;Rerun Run 5, same VDF&#x27;, avg1:76.59, avg2:76.68, laps:12, times:[77.75,76.69,77.17,77.22,77.57,76.76,76.87,77.05,76.51,76.56,77.07], comment:&quot;That was actually pretty good — felt confident. Still a little snug through 1 and 2; turn one much better turning left, tight turning right up the hill.&quot;},
-      {no:7, desc:&#x27;Run 06 + LS truck arm in mid hole&#x27;, avg1:76.60, avg2:76.64, laps:8, times:[76.90,76.57,76.74,76.71,76.65,76.71,76.58], comment:&#x27;&#x27;},
-      {no:8, desc:&#x27;Run 07 + front frame heights dropped to 4&quot;&#x27;, avg1:76.30, avg2:76.61, laps:5, times:[76.52,77.54,76.20,76.17], comment:&quot;Really good — weight transfer is better, front of the car felt more in command.&quot;},
-      {no:9, desc:&#x27;Run 08 + TB up 0.5in both sides&#x27;, avg1:76.65, avg2:77.19, laps:5, times:[78.81,76.59,76.55,76.81], comment:&quot;Got me tighter — worse on the low speed, tied up on the high speed too.&quot;}
-    ]
-  },
-  {
-    id:&#x27;20260615_NOS_SON_JGR54_DS&#x27;, driver:&#x27;Taylor Gray&#x27;, car:&#x27;JGR54&#x27;,
-    date:&#x27;Jun 15&#x27;, dateSort:20260615, track:&#x27;Sonoma_v2401&#x27;, sim:&#x27;GTX&#x27;, tire:&#x27;25Son1_o06&#x27;, totalLaps:80,
-    runs:[
-      {no:1, desc:&#x27;26SON1 54b AB1&#x27;, avg1:77.18, avg2:77.32, laps:13, times:[78.68,78.15,78.20,77.65,77.63,77.20,78.18,77.75,77.84,77.03,77.41,77.31], comment:&quot;1300 brake gain, SD surface. Balance is pretty good. Hard to go fast — can&#x27;t run the car out over the rumble strips on exit (they pull the car hard into them). [HD Off]&quot;},
-      {no:2, desc:&#x27;Run 1 with RSTA to T hole&#x27;, avg1:77.31, avg2:77.64, laps:5, times:[77.47,77.23,78.61,77.24], comment:&quot;Was okay. Lost a little rear lateral grip there. [HD Off]&quot;},
-      {no:3, desc:&#x27;Rerun Run 1&#x27;, avg1:null, avg2:null, laps:0, times:[], comment:&quot;Tightened the front a bit, added some rear lateral grip. Car was a little tight everywhere, lacked a bit of forward drive. [Model crash — no data; curbs caused the wreck. HD Off]&quot;},
-      {no:4, desc:&#x27;Rerun Run 1 with HD surface&#x27;, avg1:76.53, avg2:76.62, laps:13, times:[77.68,77.11,76.87,76.69,76.48,77.21,76.82,77.11,77.31,76.91,76.71,76.42], comment:&quot;HD surface fixed the curb issue. Lefts a little snug but rights are too tight — rights tighter than lefts.&quot;},
-      {no:5, desc:&#x27;Run 4 with LSTA to M hole&#x27;, avg1:76.60, avg2:76.64, laps:8, times:[76.90,76.57,76.74,76.71,76.65,76.71,76.58], comment:&quot;Balance alright. Snug in medium-to-high speed corners, good in low speed. No more left-to-right disconnect.&quot;},
-      {no:6, desc:&#x27;Rerun Run 4&#x27;, avg1:76.77, avg2:76.92, laps:6, times:[76.76,77.15,76.70,77.16,76.84], comment:&quot;Tight everywhere. More tight in the rights than the lefts.&quot;},
-      {no:7, desc:&#x27;Run 4 with 1% wedge add&#x27;, avg1:76.67, avg2:76.87, laps:5, times:[77.46,76.69,76.67,76.66], comment:&quot;Still too tight. Tighter through the lefts than last run. Didn&#x27;t free it up to the right.&quot;},
-      {no:8, desc:&#x27;Rerun Run 5&#x27;, avg1:76.51, avg2:76.57, laps:10, times:[77.09,77.57,76.54,77.13,76.73,76.60,76.77,76.56,76.42], comment:&quot;Better. A little snug but also lacking some rear lateral grip. Freer both directions. Tightest through 1/2, 4a, 8, 8a, 10. Slight lack of rear lateral out of slow-speed corners.&quot;},
-      {no:9, desc:&#x27;Run 5 with a 2470 bar&#x27;, avg1:76.53, avg2:76.62, laps:9, times:[77.08,76.62,76.79,76.74,76.39,77.08,76.97,76.57], comment:&quot;Front grip better. Lacking a little rear lateral grip and forward drive. Not much change from previous. Still too tight through 10.&quot;},
-      {no:10, desc:&#x27;Run 1 with track bar up 1/2&quot; both sides&#x27;, avg1:76.67, avg2:76.75, laps:6, times:[76.80,76.82,76.64,76.93,76.58], comment:&quot;Felt pretty good — wouldn&#x27;t ask for anything different. Still too tight through 10 and 4a. Could use more drive out of slow-speed corners.&quot;},
-      {no:11, desc:&#x27;Rerun Run 5&#x27;, avg1:76.34, avg2:76.47, laps:5, times:[76.87,76.38,76.38,76.26], comment:&quot;Felt really good. Fixed turn 10. Forward drive really good, 4a pretty solid.&quot;}
-    ]
-  },
-  {
-    id:&#x27;20260615_NOS_SON_JGR19_DS&#x27;, driver:&#x27;Brent Crews&#x27;, car:&#x27;JGR19&#x27;,
-    date:&#x27;Jun 15&#x27;, dateSort:20260615.5, track:&#x27;Sonoma_v2401_AltSF&#x27;, sim:&#x27;GTX&#x27;, tire:&#x27;25Son1_o06&#x27;, totalLaps:25,
-    runs:[
-      {no:1, desc:&#x27;AB1v3 on the cold tire&#x27;, avg1:77.14, avg2:77.27, laps:9, times:[78.35,77.54,77.39,77.58,80.68,76.92,77.31,77.18], comment:&quot;Too tight in both directions. Snaps free off on exit — so much wheel in it when it grips up.&quot;},
-      {no:2, desc:&#x27;Rerun R2 with track bar +1/2&quot; both sides&#x27;, avg1:77.71, avg2:77.71, laps:4, times:[79.08,77.03,77.03], comment:&quot;Couldn&#x27;t get it turned as well in T12 — have to wait on it in the faster high speed. Helped overall vs last setup; lost a tiny bit of drive but a positive change.&quot;},
-      {no:3, desc:&#x27;Rerun R2 + -0.2% NW, -0.5% wedge, 298@55 front shocks&#x27;, avg1:84.70, avg2:84.70, laps:3, times:[92.64,76.75], comment:&quot;Still doesn&#x27;t drive quite right — feels disconnected in the rear. Freed up overall balance (a gain).&quot;},
-      {no:4, desc:&#x27;Rerun R3 with track bar -1/4&quot; both sides&#x27;, avg1:77.37, avg2:77.50, laps:5, times:[77.73,77.59,77.89,76.79], comment:&quot;Feels really good. Better, but still not as good as it was in GT12. Still good though.&quot;},
-      {no:5, desc:&#x27;Rerun R4 with track bar heights 5 3/4&quot; | 6 1/4&quot;&#x27;, avg1:77.26, avg2:77.26, laps:4, times:[77.75,76.87,77.17], comment:&quot;Really tight on entry, then it hikes up the inside tire so I snap free off.&quot;},
-      {no:6, desc:&#x27;Rerun R5 with FARB in&#x27;, avg1:null, avg2:null, laps:0, times:[], comment:&quot;Better — a bit on the freer side, but the platform and point were way better. [No lap data recorded]&quot;}
-    ]
-  },
-  {
-    id:&#x27;20260616_NOS_SON_JGR20_DS&#x27;, driver:&#x27;Brandon Jones&#x27;, car:&#x27;JGR20&#x27;,
-    date:&#x27;Jun 16&#x27;, dateSort:20260616, track:&#x27;Sonoma_v2401_AltSF&#x27;, sim:&#x27;GTX&#x27;, tire:&#x27;25Son1_o06&#x27;, totalLaps:33,
-    runs:[
-      {no:1, desc:&#x27;Test&#x27;, avg1:79.61, avg2:79.61, laps:2, times:[79.61], comment:&quot;&quot;},
-      {no:2, desc:&#x27;Brandon in · last year\u2019s post&#x27;, avg1:78.06, avg2:78.32, laps:8, times:[80.15,79.84,78.93,78.46,77.93,78.08,78.18], comment:&quot;Felt pretty good.&quot;},
-      {no:3, desc:&#x27;26SON1 AB1&#x27;, avg1:77.52, avg2:77.67, laps:8, times:[79.03,77.86,91.71,77.57,77.26,77.93,77.74], comment:&quot;Pretty similar to last year\u2019s — overall tight. Staying out of 1st and in 2nd helped through 11 and 7. Drive off is pretty solid.&quot;},
-      {no:4, desc:&#x27;26SON1 AB1 with Set 400 front shocks&#x27;, avg1:77.26, avg2:77.42, laps:8, times:[78.48,77.94,77.54,77.67,77.63,77.02,77.23], comment:&quot;Overall better for front turn — not huge. Most misses are from carrying too much center min speed; T1 is sensitive to this. Gets through T3 and T7 really good; charge T3 too hard and I get tight.&quot;},
-      {no:5, desc:&#x27;Run 4, more front camber&#x27;, avg1:76.92, avg2:77.09, laps:7, times:[78.44,77.04,76.79,76.92,77.26,77.45], comment:&quot;Better through T1. Maybe a little better through T3/T3A. Noticeably better through T1 and maybe T10 also.&quot;}
-    ]
-  }
+ {
+  &quot;id&quot;: &quot;20260602_NOS_SON_JGR19_DS&quot;,
+  &quot;driver&quot;: &quot;Brent Crews&quot;,
+  &quot;car&quot;: &quot;JGR19&quot;,
+  &quot;date&quot;: &quot;Jun 2&quot;,
+  &quot;dateSort&quot;: 20260602,
+  &quot;track&quot;: &quot;Sonoma_v2302&quot;,
+  &quot;sim&quot;: &quot;GT12&quot;,
+  &quot;tire&quot;: &quot;25Son1_o06&quot;,
+  &quot;totalLaps&quot;: 21,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;2026 SON 19 Car 25Son Race 4TFG L15&quot;,
+    &quot;avg1&quot;: 135.5,
+    &quot;avg2&quot;: 135.5,
+    &quot;laps&quot;: 3,
+    &quot;times&quot;: [
+     129.45,
+     141.55
+    ],
+    &quot;comment&quot;: &quot;Balance feels good though, feel like I would want more drive — need to see what it does to the fast right.&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;Rerun R01 · Load Soft Saturations&quot;,
+    &quot;avg1&quot;: 77.82,
+    &quot;avg2&quot;: 77.82,
+    &quot;laps&quot;: 3,
+    &quot;times&quot;: [
+     78.18,
+     77.45
+    ],
+    &quot;comment&quot;: &quot;Need more drive out of the last corner and T4/7 tight rights. Feels pretty close — not enough drive in T4/7/11.&quot;
+   },
+   {
+    &quot;no&quot;: 3,
+    &quot;desc&quot;: &quot;R02 + RS Truck Arm&quot;,
+    &quot;avg1&quot;: 77.39,
+    &quot;avg2&quot;: 77.39,
+    &quot;laps&quot;: 3,
+    &quot;times&quot;: [
+     77.42,
+     77.35
+    ],
+    &quot;comment&quot;: &quot;Really really tight, loss everywhere. Super snappy loose the second I released wheel — had so much wheel in it. Felt lazy through the esses.&quot;
+   },
+   {
+    &quot;no&quot;: 4,
+    &quot;desc&quot;: &quot;Rerun R02&quot;,
+    &quot;avg1&quot;: 76.92,
+    &quot;avg2&quot;: 76.92,
+    &quot;laps&quot;: 2,
+    &quot;times&quot;: [
+     76.92
+    ],
+    &quot;comment&quot;: &quot;Most positive turn I have had yet. Could use a little better cut in the high speed stuff and a little more drive in the slow speed stuff.&quot;
+   },
+   {
+    &quot;no&quot;: 5,
+    &quot;desc&quot;: &quot;R03 + 350 Rears&quot;,
+    &quot;avg1&quot;: 77.33,
+    &quot;avg2&quot;: 77.33,
+    &quot;laps&quot;: 3,
+    &quot;times&quot;: [
+     77.36,
+     77.3
+    ],
+    &quot;comment&quot;: &quot;Good cut, could not carry a lot of lateral grip. Back-and-forth direction was super fast — rear could not hold onto it.&quot;
+   },
+   {
+    &quot;no&quot;: 6,
+    &quot;desc&quot;: &quot;R04 + TB Down 0.25\&quot;&quot;,
+    &quot;avg1&quot;: 78.25,
+    &quot;avg2&quot;: 78.25,
+    &quot;laps&quot;: 2,
+    &quot;times&quot;: [
+     78.25
+    ],
+    &quot;comment&quot;: &quot;&quot;
+   },
+   {
+    &quot;no&quot;: 7,
+    &quot;desc&quot;: &quot;Rerun R06&quot;,
+    &quot;avg1&quot;: 77.31,
+    &quot;avg2&quot;: 77.31,
+    &quot;laps&quot;: 3,
+    &quot;times&quot;: [
+     77.58,
+     77.04
+    ],
+    &quot;comment&quot;: &quot;Second favorite, lacks entry stability in the fast corners. Gets free in the downhill-left and anywhere a constant radius tightens up.&quot;
+   },
+   {
+    &quot;no&quot;: 8,
+    &quot;desc&quot;: &quot;R05 + Linear Fronts + 0.1 NW&quot;,
+    &quot;avg1&quot;: 76.86,
+    &quot;avg2&quot;: 76.86,
+    &quot;laps&quot;: 2,
+    &quot;times&quot;: [
+     76.86
+    ],
+    &quot;comment&quot;: &quot;Better — feel like I have no rear tracking. Front could be better, just feels like the rear is out of the track.&quot;
+   }
+  ]
+ },
+ {
+  &quot;id&quot;: &quot;20260609_NOS_SON_JGR54_DS&quot;,
+  &quot;driver&quot;: &quot;Taylor Gray&quot;,
+  &quot;car&quot;: &quot;JGR54&quot;,
+  &quot;date&quot;: &quot;Jun 9&quot;,
+  &quot;dateSort&quot;: 20260609,
+  &quot;track&quot;: &quot;Sonoma_v2302&quot;,
+  &quot;sim&quot;: &quot;GT12&quot;,
+  &quot;tire&quot;: &quot;25Son1_o06&quot;,
+  &quot;totalLaps&quot;: 21,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;54 car L42&quot;,
+    &quot;avg1&quot;: 77.43,
+    &quot;avg2&quot;: 77.52,
+    &quot;laps&quot;: 13,
+    &quot;times&quot;: [
+     78.97,
+     78.78,
+     78.09,
+     78.37,
+     77.82,
+     77.95,
+     77.76,
+     77.57,
+     77.48,
+     77.77,
+     77.45,
+     77.35
+    ],
+    &quot;comment&quot;: &quot;Feels pretty good, honestly. Maybe a little snug — up the hill to the switchback to two. Overall pretty close. Curbs felt really realistic.&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;18b start race&quot;,
+    &quot;avg1&quot;: 77.3,
+    &quot;avg2&quot;: 77.38,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     77.97,
+     77.65,
+     115.88,
+     77.36,
+     77.23,
+     77.3,
+     77.36
+    ],
+    &quot;comment&quot;: &quot;On the splitter under braking on the downhill right-hander — get really tight there. More prone to lock up with this setup, and a little tighter in the high-speed stuff.&quot;
+   }
+  ]
+ },
+ {
+  &quot;id&quot;: &quot;20260611_NOS_SON_JGR54_DS&quot;,
+  &quot;driver&quot;: &quot;Taylor Gray&quot;,
+  &quot;car&quot;: &quot;JGR54&quot;,
+  &quot;date&quot;: &quot;Jun 11&quot;,
+  &quot;dateSort&quot;: 20260611,
+  &quot;track&quot;: &quot;Sonoma_v2302&quot;,
+  &quot;sim&quot;: &quot;GT12&quot;,
+  &quot;tire&quot;: &quot;25Son1_o06&quot;,
+  &quot;totalLaps&quot;: 63,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;25SON1 54b L42 setup&quot;,
+    &quot;avg1&quot;: 76.82,
+    &quot;avg2&quot;: 76.98,
+    &quot;laps&quot;: 10,
+    &quot;times&quot;: [
+     77.5,
+     78.28,
+     76.94,
+     77.51,
+     77.29,
+     76.56,
+     76.96,
+     77.13,
+     77.8
+    ],
+    &quot;comment&quot;: &quot;Balance isn&#x27;t bad. Probably a little snug through the slow-speed stuff. High-speed stuff I&#x27;m pretty good at.&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;26SON1 54b AB1&quot;,
+    &quot;avg1&quot;: 76.91,
+    &quot;avg2&quot;: 76.96,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     77.05,
+     76.92,
+     77.03,
+     76.96,
+     77.17,
+     77.18,
+     76.86
+    ],
+    &quot;comment&quot;: &quot;Similar to last run. Snug in T2 up the hill turning right; need more positive front rotation switching from loading right-rear to left-rear. Good through the fast kink.&quot;
+   },
+   {
+    &quot;no&quot;: 3,
+    &quot;desc&quot;: &quot;25SON1 18b start race&quot;,
+    &quot;avg1&quot;: 77,
+    &quot;avg2&quot;: 77.18,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     77.44,
+     78.17,
+     77.17,
+     77.56,
+     77.45,
+     76.89,
+     76.93
+    ],
+    &quot;comment&quot;: &quot;Not much there. Still need to turn better in the same areas — lost some lateral grip and got the hiders through the fast kink on the backstretch.&quot;
+   },
+   {
+    &quot;no&quot;: 4,
+    &quot;desc&quot;: &quot;26SON1 54b AB1 + RS truck arm to top hole&quot;,
+    &quot;avg1&quot;: 77.33,
+    &quot;avg2&quot;: 77.4,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     77.38,
+     77.43,
+     77.61,
+     77.19
+    ],
+    &quot;comment&quot;: &quot;A little better — felt more of a change, right direction. Could use a bit more front. Starting to get the back too loose, losing overall rear drive.&quot;
+   },
+   {
+    &quot;no&quot;: 5,
+    &quot;desc&quot;: &quot;Rerun Run 2&quot;,
+    &quot;avg1&quot;: 76.73,
+    &quot;avg2&quot;: 76.73,
+    &quot;laps&quot;: 2,
+    &quot;times&quot;: [
+     76.73
+    ],
+    &quot;comment&quot;: &quot;&quot;
+   },
+   {
+    &quot;no&quot;: 6,
+    &quot;desc&quot;: &quot;Rerun Run 5, same VDF&quot;,
+    &quot;avg1&quot;: 76.59,
+    &quot;avg2&quot;: 76.68,
+    &quot;laps&quot;: 12,
+    &quot;times&quot;: [
+     77.75,
+     76.69,
+     77.17,
+     77.22,
+     77.57,
+     76.76,
+     76.87,
+     77.05,
+     76.51,
+     76.56,
+     77.07
+    ],
+    &quot;comment&quot;: &quot;That was actually pretty good — felt confident. Still a little snug through 1 and 2; turn one much better turning left, tight turning right up the hill.&quot;
+   },
+   {
+    &quot;no&quot;: 7,
+    &quot;desc&quot;: &quot;Run 06 + LS truck arm in mid hole&quot;,
+    &quot;avg1&quot;: 76.6,
+    &quot;avg2&quot;: 76.64,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     76.9,
+     76.57,
+     76.74,
+     76.71,
+     76.65,
+     76.71,
+     76.58
+    ],
+    &quot;comment&quot;: &quot;&quot;
+   },
+   {
+    &quot;no&quot;: 8,
+    &quot;desc&quot;: &quot;Run 07 + front frame heights dropped to 4\&quot;&quot;,
+    &quot;avg1&quot;: 76.3,
+    &quot;avg2&quot;: 76.61,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     76.52,
+     77.54,
+     76.2,
+     76.17
+    ],
+    &quot;comment&quot;: &quot;Really good — weight transfer is better, front of the car felt more in command.&quot;
+   },
+   {
+    &quot;no&quot;: 9,
+    &quot;desc&quot;: &quot;Run 08 + TB up 0.5in both sides&quot;,
+    &quot;avg1&quot;: 76.65,
+    &quot;avg2&quot;: 77.19,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     78.81,
+     76.59,
+     76.55,
+     76.81
+    ],
+    &quot;comment&quot;: &quot;Got me tighter — worse on the low speed, tied up on the high speed too.&quot;
+   }
+  ]
+ },
+ {
+  &quot;id&quot;: &quot;20260615_NOS_SON_JGR54_DS&quot;,
+  &quot;driver&quot;: &quot;Taylor Gray&quot;,
+  &quot;car&quot;: &quot;JGR54&quot;,
+  &quot;date&quot;: &quot;Jun 15&quot;,
+  &quot;dateSort&quot;: 20260615,
+  &quot;track&quot;: &quot;Sonoma_v2401&quot;,
+  &quot;sim&quot;: &quot;GTX&quot;,
+  &quot;tire&quot;: &quot;25Son1_o06&quot;,
+  &quot;totalLaps&quot;: 80,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;26SON1 54b AB1&quot;,
+    &quot;avg1&quot;: 77.18,
+    &quot;avg2&quot;: 77.32,
+    &quot;laps&quot;: 13,
+    &quot;times&quot;: [
+     78.68,
+     78.15,
+     78.2,
+     77.65,
+     77.63,
+     77.2,
+     78.18,
+     77.75,
+     77.84,
+     77.03,
+     77.41,
+     77.31
+    ],
+    &quot;comment&quot;: &quot;1300 brake gain, SD surface. Balance is pretty good. Hard to go fast — can&#x27;t run the car out over the rumble strips on exit (they pull the car hard into them). [HD Off]&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;Run 1 with RSTA to T hole&quot;,
+    &quot;avg1&quot;: 77.31,
+    &quot;avg2&quot;: 77.64,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     77.47,
+     77.23,
+     78.61,
+     77.24
+    ],
+    &quot;comment&quot;: &quot;Was okay. Lost a little rear lateral grip there. [HD Off]&quot;
+   },
+   {
+    &quot;no&quot;: 3,
+    &quot;desc&quot;: &quot;Rerun Run 1&quot;,
+    &quot;avg1&quot;: null,
+    &quot;avg2&quot;: null,
+    &quot;laps&quot;: 0,
+    &quot;times&quot;: [],
+    &quot;comment&quot;: &quot;Tightened the front a bit, added some rear lateral grip. Car was a little tight everywhere, lacked a bit of forward drive. [Model crash — no data; curbs caused the wreck. HD Off]&quot;
+   },
+   {
+    &quot;no&quot;: 4,
+    &quot;desc&quot;: &quot;Rerun Run 1 with HD surface&quot;,
+    &quot;avg1&quot;: 76.53,
+    &quot;avg2&quot;: 76.62,
+    &quot;laps&quot;: 13,
+    &quot;times&quot;: [
+     77.68,
+     77.11,
+     76.87,
+     76.69,
+     76.48,
+     77.21,
+     76.82,
+     77.11,
+     77.31,
+     76.91,
+     76.71,
+     76.42
+    ],
+    &quot;comment&quot;: &quot;HD surface fixed the curb issue. Lefts a little snug but rights are too tight — rights tighter than lefts.&quot;
+   },
+   {
+    &quot;no&quot;: 5,
+    &quot;desc&quot;: &quot;Run 4 with LSTA to M hole&quot;,
+    &quot;avg1&quot;: 76.6,
+    &quot;avg2&quot;: 76.64,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     76.9,
+     76.57,
+     76.74,
+     76.71,
+     76.65,
+     76.71,
+     76.58
+    ],
+    &quot;comment&quot;: &quot;Balance alright. Snug in medium-to-high speed corners, good in low speed. No more left-to-right disconnect.&quot;
+   },
+   {
+    &quot;no&quot;: 6,
+    &quot;desc&quot;: &quot;Rerun Run 4&quot;,
+    &quot;avg1&quot;: 76.77,
+    &quot;avg2&quot;: 76.92,
+    &quot;laps&quot;: 6,
+    &quot;times&quot;: [
+     76.76,
+     77.15,
+     76.7,
+     77.16,
+     76.84
+    ],
+    &quot;comment&quot;: &quot;Tight everywhere. More tight in the rights than the lefts.&quot;
+   },
+   {
+    &quot;no&quot;: 7,
+    &quot;desc&quot;: &quot;Run 4 with 1% wedge add&quot;,
+    &quot;avg1&quot;: 76.67,
+    &quot;avg2&quot;: 76.87,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     77.46,
+     76.69,
+     76.67,
+     76.66
+    ],
+    &quot;comment&quot;: &quot;Still too tight. Tighter through the lefts than last run. Didn&#x27;t free it up to the right.&quot;
+   },
+   {
+    &quot;no&quot;: 8,
+    &quot;desc&quot;: &quot;Rerun Run 5&quot;,
+    &quot;avg1&quot;: 76.51,
+    &quot;avg2&quot;: 76.57,
+    &quot;laps&quot;: 10,
+    &quot;times&quot;: [
+     77.09,
+     77.57,
+     76.54,
+     77.13,
+     76.73,
+     76.6,
+     76.77,
+     76.56,
+     76.42
+    ],
+    &quot;comment&quot;: &quot;Better. A little snug but also lacking some rear lateral grip. Freer both directions. Tightest through 1/2, 4a, 8, 8a, 10. Slight lack of rear lateral out of slow-speed corners.&quot;
+   },
+   {
+    &quot;no&quot;: 9,
+    &quot;desc&quot;: &quot;Run 5 with a 2470 bar&quot;,
+    &quot;avg1&quot;: 76.53,
+    &quot;avg2&quot;: 76.62,
+    &quot;laps&quot;: 9,
+    &quot;times&quot;: [
+     77.08,
+     76.62,
+     76.79,
+     76.74,
+     76.39,
+     77.08,
+     76.97,
+     76.57
+    ],
+    &quot;comment&quot;: &quot;Front grip better. Lacking a little rear lateral grip and forward drive. Not much change from previous. Still too tight through 10.&quot;
+   },
+   {
+    &quot;no&quot;: 10,
+    &quot;desc&quot;: &quot;Run 1 with track bar up 1/2\&quot; both sides&quot;,
+    &quot;avg1&quot;: 76.67,
+    &quot;avg2&quot;: 76.75,
+    &quot;laps&quot;: 6,
+    &quot;times&quot;: [
+     76.8,
+     76.82,
+     76.64,
+     76.93,
+     76.58
+    ],
+    &quot;comment&quot;: &quot;Felt pretty good — wouldn&#x27;t ask for anything different. Still too tight through 10 and 4a. Could use more drive out of slow-speed corners.&quot;
+   },
+   {
+    &quot;no&quot;: 11,
+    &quot;desc&quot;: &quot;Rerun Run 5&quot;,
+    &quot;avg1&quot;: 76.34,
+    &quot;avg2&quot;: 76.47,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     76.87,
+     76.38,
+     76.38,
+     76.26
+    ],
+    &quot;comment&quot;: &quot;Felt really good. Fixed turn 10. Forward drive really good, 4a pretty solid.&quot;
+   }
+  ]
+ },
+ {
+  &quot;id&quot;: &quot;20260615_NOS_SON_JGR19_DS&quot;,
+  &quot;driver&quot;: &quot;Brent Crews&quot;,
+  &quot;car&quot;: &quot;JGR19&quot;,
+  &quot;date&quot;: &quot;Jun 15&quot;,
+  &quot;dateSort&quot;: 20260615.5,
+  &quot;track&quot;: &quot;Sonoma_v2401_AltSF&quot;,
+  &quot;sim&quot;: &quot;GTX&quot;,
+  &quot;tire&quot;: &quot;25Son1_o06&quot;,
+  &quot;totalLaps&quot;: 25,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;AB1v3 on the cold tire&quot;,
+    &quot;avg1&quot;: 77.14,
+    &quot;avg2&quot;: 77.27,
+    &quot;laps&quot;: 9,
+    &quot;times&quot;: [
+     78.35,
+     77.54,
+     77.39,
+     77.58,
+     80.68,
+     76.92,
+     77.31,
+     77.18
+    ],
+    &quot;comment&quot;: &quot;Too tight in both directions. Snaps free off on exit — so much wheel in it when it grips up.&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;Rerun R2 with track bar +1/2\&quot; both sides&quot;,
+    &quot;avg1&quot;: 77.71,
+    &quot;avg2&quot;: 77.71,
+    &quot;laps&quot;: 4,
+    &quot;times&quot;: [
+     79.08,
+     77.03,
+     77.03
+    ],
+    &quot;comment&quot;: &quot;Couldn&#x27;t get it turned as well in T12 — have to wait on it in the faster high speed. Helped overall vs last setup; lost a tiny bit of drive but a positive change.&quot;
+   },
+   {
+    &quot;no&quot;: 3,
+    &quot;desc&quot;: &quot;Rerun R2 + -0.2% NW, -0.5% wedge, 298@55 front shocks&quot;,
+    &quot;avg1&quot;: 84.7,
+    &quot;avg2&quot;: 84.7,
+    &quot;laps&quot;: 3,
+    &quot;times&quot;: [
+     92.64,
+     76.75
+    ],
+    &quot;comment&quot;: &quot;Still doesn&#x27;t drive quite right — feels disconnected in the rear. Freed up overall balance (a gain).&quot;
+   },
+   {
+    &quot;no&quot;: 4,
+    &quot;desc&quot;: &quot;Rerun R3 with track bar -1/4\&quot; both sides&quot;,
+    &quot;avg1&quot;: 77.37,
+    &quot;avg2&quot;: 77.5,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     77.73,
+     77.59,
+     77.89,
+     76.79
+    ],
+    &quot;comment&quot;: &quot;Feels really good. Better, but still not as good as it was in GT12. Still good though.&quot;
+   },
+   {
+    &quot;no&quot;: 5,
+    &quot;desc&quot;: &quot;Rerun R4 with track bar heights 5 3/4\&quot; | 6 1/4\&quot;&quot;,
+    &quot;avg1&quot;: 77.26,
+    &quot;avg2&quot;: 77.26,
+    &quot;laps&quot;: 4,
+    &quot;times&quot;: [
+     77.75,
+     76.87,
+     77.17
+    ],
+    &quot;comment&quot;: &quot;Really tight on entry, then it hikes up the inside tire so I snap free off.&quot;
+   },
+   {
+    &quot;no&quot;: 6,
+    &quot;desc&quot;: &quot;Rerun R5 with FARB in&quot;,
+    &quot;avg1&quot;: null,
+    &quot;avg2&quot;: null,
+    &quot;laps&quot;: 0,
+    &quot;times&quot;: [],
+    &quot;comment&quot;: &quot;Better — a bit on the freer side, but the platform and point were way better. [No lap data recorded]&quot;
+   }
+  ]
+ },
+ {
+  &quot;id&quot;: &quot;20260616_NOS_SON_JGR20_DS&quot;,
+  &quot;driver&quot;: &quot;Brandon Jones&quot;,
+  &quot;car&quot;: &quot;JGR20&quot;,
+  &quot;date&quot;: &quot;Jun 16&quot;,
+  &quot;dateSort&quot;: 20260616,
+  &quot;track&quot;: &quot;Sonoma_v2401_AltSF&quot;,
+  &quot;sim&quot;: &quot;GTX&quot;,
+  &quot;tire&quot;: &quot;25Son1_o06&quot;,
+  &quot;totalLaps&quot;: 33,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;Test&quot;,
+    &quot;avg1&quot;: 79.61,
+    &quot;avg2&quot;: 79.61,
+    &quot;laps&quot;: 2,
+    &quot;times&quot;: [
+     79.61
+    ],
+    &quot;comment&quot;: &quot;&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;Brandon in · last year’s post&quot;,
+    &quot;avg1&quot;: 78.06,
+    &quot;avg2&quot;: 78.32,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     80.15,
+     79.84,
+     78.93,
+     78.46,
+     77.93,
+     78.08,
+     78.18
+    ],
+    &quot;comment&quot;: &quot;Felt pretty good.&quot;
+   },
+   {
+    &quot;no&quot;: 3,
+    &quot;desc&quot;: &quot;26SON1 AB1&quot;,
+    &quot;avg1&quot;: 77.52,
+    &quot;avg2&quot;: 77.67,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     79.03,
+     77.86,
+     91.71,
+     77.57,
+     77.26,
+     77.93,
+     77.74
+    ],
+    &quot;comment&quot;: &quot;Pretty similar to last year’s — overall tight. Staying out of 1st and in 2nd helped through 11 and 7. Drive off is pretty solid.&quot;
+   },
+   {
+    &quot;no&quot;: 4,
+    &quot;desc&quot;: &quot;26SON1 AB1 with Set 400 front shocks&quot;,
+    &quot;avg1&quot;: 77.26,
+    &quot;avg2&quot;: 77.42,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     78.48,
+     77.94,
+     77.54,
+     77.67,
+     77.63,
+     77.02,
+     77.23
+    ],
+    &quot;comment&quot;: &quot;Overall better for front turn — not huge. Most misses are from carrying too much center min speed; T1 is sensitive to this. Gets through T3 and T7 really good; charge T3 too hard and I get tight.&quot;
+   },
+   {
+    &quot;no&quot;: 5,
+    &quot;desc&quot;: &quot;Run 4, more front camber&quot;,
+    &quot;avg1&quot;: 76.92,
+    &quot;avg2&quot;: 77.09,
+    &quot;laps&quot;: 7,
+    &quot;times&quot;: [
+     78.44,
+     77.04,
+     76.79,
+     76.92,
+     77.26,
+     77.45
+    ],
+    &quot;comment&quot;: &quot;Better through T1. Maybe a little better through T3/T3A. Noticeably better through T1 and maybe T10 also.&quot;
+   }
+  ]
+ },
+ {
+  &quot;id&quot;: &quot;20260616_NOS_SON_JGR18_DS&quot;,
+  &quot;driver&quot;: &quot;William Sawalich&quot;,
+  &quot;car&quot;: &quot;JGR18&quot;,
+  &quot;date&quot;: &quot;Jun 16&quot;,
+  &quot;dateSort&quot;: 20260616,
+  &quot;track&quot;: &quot;Sonoma_v2401&quot;,
+  &quot;sim&quot;: &quot;GT12&quot;,
+  &quot;tire&quot;: &quot;25Son1_o06&quot;,
+  &quot;totalLaps&quot;: 14,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;18C Baseline&quot;,
+    &quot;avg1&quot;: 77.37,
+    &quot;avg2&quot;: 77.49,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     77.86,
+     77.3,
+     77.52,
+     77.29
+    ],
+    &quot;comment&quot;: &quot;Definitely can&#x27;t push it as hard as GTX. T1 up the hills it&#x27;s fine, tight, but once I start turning back right for T2 it&#x27;s tight — can&#x27;t get it straight, low off T2, tight across center rolling. T3 to make that left, need a little more brake; T3 not bad. T4 tight off center. T7 tight trying to rotate. T8 fine, a little loose off laterally. T10 pretty good but tight on throttle. T11 fine.&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;R01+ FARB change&quot;,
+    &quot;avg1&quot;: 77.14,
+    &quot;avg2&quot;: 77.28,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     77.69,
+     77.52,
+     76.94,
+     76.97
+    ],
+    &quot;comment&quot;: &quot;That helped me turn a little bit. Nothing crazy — maybe a little drive out of T2 or T3.&quot;
+   },
+   {
+    &quot;no&quot;: 3,
+    &quot;desc&quot;: &quot;R02+ Front Frame change&quot;,
+    &quot;avg1&quot;: 76.98,
+    &quot;avg2&quot;: 76.98,
+    &quot;laps&quot;: 4,
+    &quot;times&quot;: [
+     77.02,
+     76.93,
+     76.99
+    ],
+    &quot;comment&quot;: &quot;I didn&#x27;t notice anything.&quot;
+   }
+  ]
+ }
 ];
 
 /* =================== DERIVED =================== */
