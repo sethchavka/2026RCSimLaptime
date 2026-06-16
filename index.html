@@ -227,7 +227,7 @@ body{
   background-attachment:fixed; transition:background-color .25s,color .25s;
 }
 ::selection{background:var(--accent);color:#0a0c00}
-.main{max-width:1180px;margin:0 auto;padding:0 0 60px}
+.main{max-width:1480px;margin:0 auto;padding:0 0 60px}
 
 /* ===== HEADER ===== */
 .header{position:relative;padding:34px 32px 26px;border-bottom:1px solid var(--line);overflow:hidden;
@@ -299,7 +299,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
 .filter-sep{width:1px;align-self:stretch;background:var(--line);margin:2px 6px}
 
 /* ===== SESSION CARDS ===== */
-.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .session-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
 .session-head{padding:14px 16px;border-bottom:1px solid var(--line);position:relative}
 .session-head::before{content:&quot;&quot;;position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--cc,var(--muted))}
@@ -413,6 +413,10 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;section-label&quot;&gt;Summary&lt;/div&gt;
     &lt;div class=&quot;summary-grid&quot; id=&quot;summary-grid&quot;&gt;&lt;/div&gt;
 
+    &lt;!-- DRIVER COUNTERS --&gt;
+    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
+    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
+
     &lt;!-- CHART: best lap per session --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Best Lap Per Session&lt;/div&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
@@ -431,10 +435,6 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
-
-    &lt;!-- DRIVER COUNTERS --&gt;
-    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
-    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
 
     &lt;!-- SESSIONS --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Sessions&lt;/div&gt;
@@ -1216,7 +1216,7 @@ body{
   background-attachment:fixed; transition:background-color .25s,color .25s;
 }
 ::selection{background:var(--accent);color:#0a0c00}
-.main{max-width:1180px;margin:0 auto;padding:0 0 60px}
+.main{max-width:1480px;margin:0 auto;padding:0 0 60px}
 
 /* ===== HEADER ===== */
 .header{position:relative;padding:34px 32px 26px;border-bottom:1px solid var(--line);overflow:hidden;
@@ -1288,7 +1288,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
 .filter-sep{width:1px;align-self:stretch;background:var(--line);margin:2px 6px}
 
 /* ===== SESSION CARDS ===== */
-.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .session-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
 .session-head{padding:14px 16px;border-bottom:1px solid var(--line);position:relative}
 .session-head::before{content:&quot;&quot;;position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--cc,var(--muted))}
@@ -1394,6 +1394,10 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;section-label&quot;&gt;Summary&lt;/div&gt;
     &lt;div class=&quot;summary-grid&quot; id=&quot;summary-grid&quot;&gt;&lt;/div&gt;
 
+    &lt;!-- DRIVER COUNTERS --&gt;
+    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
+    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
+
     &lt;!-- CHART: best lap per session --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Best Lap Per Session&lt;/div&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
@@ -1412,10 +1416,6 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
-
-    &lt;!-- DRIVER COUNTERS --&gt;
-    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
-    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
 
     &lt;!-- SESSIONS --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Sessions&lt;/div&gt;
@@ -2083,7 +2083,7 @@ body{
   background-attachment:fixed; transition:background-color .25s,color .25s;
 }
 ::selection{background:var(--accent);color:#0a0c00}
-.main{max-width:1180px;margin:0 auto;padding:0 0 60px}
+.main{max-width:1480px;margin:0 auto;padding:0 0 60px}
 
 /* ===== HEADER ===== */
 .header{position:relative;padding:34px 32px 26px;border-bottom:1px solid var(--line);overflow:hidden;
@@ -2155,7 +2155,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
 .filter-sep{width:1px;align-self:stretch;background:var(--line);margin:2px 6px}
 
 /* ===== SESSION CARDS ===== */
-.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .session-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
 .session-head{padding:14px 16px;border-bottom:1px solid var(--line);position:relative}
 .session-head::before{content:&quot;&quot;;position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--cc,var(--muted))}
@@ -2269,6 +2269,10 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;section-label&quot;&gt;Summary&lt;/div&gt;
     &lt;div class=&quot;summary-grid&quot; id=&quot;summary-grid&quot;&gt;&lt;/div&gt;
 
+    &lt;!-- DRIVER COUNTERS --&gt;
+    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
+    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
+
     &lt;!-- CHART: best lap per session --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Best Lap Per Session&lt;/div&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
@@ -2287,10 +2291,6 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
-
-    &lt;!-- DRIVER COUNTERS --&gt;
-    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
-    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
 
     &lt;!-- SESSIONS --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Sessions&lt;/div&gt;
@@ -5028,7 +5028,7 @@ body{
   background-attachment:fixed; transition:background-color .25s,color .25s;
 }
 ::selection{background:var(--accent);color:#0a0c00}
-.main{max-width:1180px;margin:0 auto;padding:0 0 60px}
+.main{max-width:1480px;margin:0 auto;padding:0 0 60px}
 
 /* ===== HEADER ===== */
 .header{position:relative;padding:34px 32px 26px;border-bottom:1px solid var(--line);overflow:hidden;
@@ -5100,7 +5100,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
 .filter-sep{width:1px;align-self:stretch;background:var(--line);margin:2px 6px}
 
 /* ===== SESSION CARDS ===== */
-.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .session-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
 .session-head{padding:14px 16px;border-bottom:1px solid var(--line);position:relative}
 .session-head::before{content:&quot;&quot;;position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--cc,var(--muted))}
@@ -5214,6 +5214,10 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;section-label&quot;&gt;Summary&lt;/div&gt;
     &lt;div class=&quot;summary-grid&quot; id=&quot;summary-grid&quot;&gt;&lt;/div&gt;
 
+    &lt;!-- DRIVER COUNTERS --&gt;
+    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
+    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
+
     &lt;!-- CHART: best lap per session --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Best Lap Per Session&lt;/div&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
@@ -5232,10 +5236,6 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
-
-    &lt;!-- DRIVER COUNTERS --&gt;
-    &lt;div class=&quot;section-label&quot;&gt;Driver Lap Counts&lt;/div&gt;
-    &lt;div class=&quot;counter-grid&quot; id=&quot;counter-grid&quot;&gt;&lt;/div&gt;
 
     &lt;!-- SESSIONS --&gt;
     &lt;div class=&quot;section-label&quot;&gt;Sessions&lt;/div&gt;
