@@ -422,7 +422,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
         &lt;div class=&quot;chart-title&quot;&gt;Best Clean Lap · By Session&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;All sessions in date order · Off-pace laps excluded (&amp;gt;110s) · gold line marks race day&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;All sessions in date order · Off-pace laps excluded · top band shows track version · gold line marks race day&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;bestChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -430,8 +430,8 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;!-- CHART: avg 1st lap distribution --&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
-        &lt;div class=&quot;chart-title&quot;&gt;Avg 1st Lap · Run Distribution&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;Every run as one dot · Tick marks show per-driver median · Bars show min–max range&lt;/div&gt;
+        &lt;div class=&quot;chart-title&quot;&gt;Avg Clean Lap · Run Distribution&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;Each run as one dot · Shaded violin shows distribution density · Diamond marks the mean&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -753,8 +753,10 @@ function driverHex(d){ return cssVar(DRIVER_META[d].color); }        // resolved
 function isGrip(d){ return !!DRIVER_META[d].grip; }
 
 /* valid laps = times below outlier threshold; cleanBest = min valid time */
+
 function runValidTimes(run){ return run.times.filter(t=&gt;t&lt;OUTLIER); }
 function runCleanBest(run){ const v=runValidTimes(run); return v.length?Math.min(...v):null; }
+function runCleanAvg(run){ const v=runValidTimes(run); return v.length? v.reduce((a,b)=&gt;a+b,0)/v.length : null; }
 function runValidLapCount(run){ return runValidTimes(run).length; }
 
 function sessionCleanBest(s){
@@ -869,7 +871,7 @@ const raceDayPlugin = {
     if(firstPost===-1){
       // all sessions pre-race: label sits left of the right-edge line, rotated
       ctx.save();
-      ctx.translate(bx-4,top+6); ctx.rotate(0);
+      ctx.translate(bx-4,top+24); ctx.rotate(0);
       ctx.textAlign=&#x27;right&#x27;;
       ctx.fillText(txt,0,0);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
@@ -877,10 +879,47 @@ const raceDayPlugin = {
       ctx.restore();
     } else {
       ctx.textAlign=&#x27;left&#x27;;
-      ctx.fillText(txt,bx+5,top+6);
+      ctx.fillText(txt,bx+5,top+24);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
-      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+18);
+      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+36);
     }
+    ctx.restore();
+  }
+};
+
+
+/* ===== TRACK TIMELINE: version segments band across the top of the Best Lap chart ===== */
+const TL_PALETTE = [&#x27;--dim&#x27;,&#x27;--hawk&#x27;,&#x27;--accent&#x27;,&#x27;--koch&#x27;,&#x27;--saw&#x27;,&#x27;--crews&#x27;];
+const trackTimelinePlugin = {
+  id:&#x27;trackTimeline&#x27;,
+  beforeDatasetsDraw(chart){
+    const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
+    if(!ordered.length) return;
+    const {ctx,chartArea:{top,left,right},scales:{x}}=chart;
+    const versions=ordered.map(s=&gt;s.track.replace(&#x27;COTA_&#x27;,&#x27;&#x27;).replace(/_AltSF$/,&#x27;&#x27;));
+    const segs=[]; let start=0;
+    for(let i=1;i&lt;=versions.length;i++){
+      if(i===versions.length || versions[i]!==versions[start]){
+        segs.push({ver:versions[start], from:start, to:i-1}); start=i;
+      }
+    }
+    // assign a stable color per distinct version (first-seen order)
+    const verColor={}; let ci=0;
+    segs.forEach(s=&gt;{ if(!(s.ver in verColor)){ verColor[s.ver]=TL_PALETTE[ci%TL_PALETTE.length]; ci++; } });
+    const bandH=14, bandTop=top+2;
+    ctx.save();
+    segs.forEach(seg=&gt;{
+      const x0 = seg.from===0 ? left : (x.getPixelForValue(seg.from-1)+x.getPixelForValue(seg.from))/2;
+      const x1 = seg.to===versions.length-1 ? right : (x.getPixelForValue(seg.to)+x.getPixelForValue(seg.to+1))/2;
+      const col = cssVar(verColor[seg.ver]||&#x27;--muted&#x27;);
+      ctx.globalAlpha=0.16; ctx.fillStyle=col; ctx.fillRect(x0,bandTop,x1-x0,bandH); ctx.globalAlpha=1;
+      ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x0,bandTop); ctx.lineTo(x1,bandTop); ctx.stroke();
+      if(x1-x0&gt;34){
+        ctx.fillStyle=col; ctx.font=&#x27;700 9px Barlow Condensed, sans-serif&#x27;;
+        ctx.textBaseline=&#x27;middle&#x27;; ctx.textAlign=&#x27;center&#x27;;
+        ctx.fillText(seg.ver, (x0+x1)/2, bandTop+bandH/2+0.5);
+      }
+    });
     ctx.restore();
   }
 };
@@ -889,7 +928,7 @@ function buildBestChart(){
   const ctx=document.getElementById(&#x27;bestChart&#x27;);
   const tick=cssVar(&#x27;--dim&#x27;), grid=cssVar(&#x27;--line&#x27;), panel=cssVar(&#x27;--panel&#x27;);
   const ordered=[...SESSIONS].sort((a,b)=&gt;a.dateSort-b.dateSort);
-  const labels=ordered.map(s=&gt;[s.date, s.track.replace(&#x27;COTA_&#x27;,&#x27;&#x27;)]);
+  const labels=ordered.map(s=&gt;s.date);
 
   // one dataset per driver, points only where they ran
   const datasets=DRIVERS_PRESENT.map(d=&gt;{
@@ -908,9 +947,10 @@ function buildBestChart(){
   bestChartObj=new Chart(ctx,{
     type:&#x27;line&#x27;,
     data:{labels,datasets},
-    plugins:[raceDayPlugin],
+    plugins:[raceDayPlugin, trackTimelinePlugin],
     options:{
       responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:22}},
       interaction:{mode:&#x27;nearest&#x27;,intersect:true},
       plugins:{
         legend:{display:false},
@@ -940,17 +980,16 @@ function buildStripChart(){
 
   // build one scatter point per run: x = driver index, y = avg1
   // exclude pure-outlier runs and race-pace runs whose avg1 is far off clean qualifying pace
-  const AVG_OUTLIER = 112; // COTA clean qualifying pace ~98-106s; excludes runs whose avg1 is inflated by an off lap
   const points=[]; const ranges={};
   DRIVERS_PRESENT.forEach((d,i)=&gt;{ ranges[d]={vals:[],i}; });
   SESSIONS.forEach(s=&gt;{
     s.runs.forEach(r=&gt;{
-      if(runCleanBest(r)===null) return;     // skip pure-outlier runs
-      if(r.avg1&gt;=AVG_OUTLIER) return;         // skip race-pace runs from qualifying-pace comparison
+      const cavg=runCleanAvg(r);             // mean of this run&#x27;s clean laps (off-laps excluded)
+      if(cavg===null) return;                // skip runs with no clean laps
       const i=DRIVERS_PRESENT.indexOf(s.driver);
       const jitter=(Math.random()-0.5)*0.34;
-      points.push({x:i+jitter, y:r.avg1, _d:s.driver, _s:s.date, _r:r.no});
-      ranges[s.driver].vals.push(r.avg1);
+      points.push({x:i+jitter, y:cavg, _d:s.driver, _s:s.date, _r:r.no});
+      ranges[s.driver].vals.push(cavg);
     });
   });
 
@@ -982,27 +1021,69 @@ function buildStripChart(){
             grid:{color:grid} },
         y:{ ticks:{color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:11},callback:v=&gt;v.toFixed(1)},
             grid:{color:grid},
-            title:{display:true,text:&#x27;Avg 1st Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
+            title:{display:true,text:&#x27;Avg Clean Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
       }
     },
     plugins:[{
-      id:&#x27;medianTicks&#x27;,
+      id:&#x27;violin&#x27;,
+      beforeDatasetsDraw(chart){
+        const {ctx,scales:{x,y}}=chart;
+        DRIVERS_PRESENT.forEach((d,i)=&gt;{
+          const vals=ranges[d].vals; if(vals.length&lt;2) return;
+          const col=driverHex(d);
+          const sorted=[...vals].sort((a,b)=&gt;a-b);
+          const mn=Math.min(...vals), mx=Math.max(...vals);
+          const n=sorted.length;
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/n;
+          const sd=Math.sqrt(vals.reduce((a,b)=&gt;a+(b-mean)*(b-mean),0)/n) || 0.4;
+          const bw=Math.max(1.06*sd*Math.pow(n,-0.2), 0.18);
+          const pad=bw*1.5;
+          const lo=mn-pad, hi=mx+pad;
+          const STEPS=48;
+          const dens=[]; let maxD=0;
+          for(let k=0;k&lt;=STEPS;k++){
+            const v=lo+(hi-lo)*k/STEPS;
+            let sum=0;
+            for(let j=0;j&lt;n;j++){ const u=(v-sorted[j])/bw; sum+=Math.exp(-0.5*u*u); }
+            const den=sum/(n*bw*Math.sqrt(2*Math.PI));
+            dens.push({v,den}); if(den&gt;maxD) maxD=den;
+          }
+          if(maxD&lt;=0) return;
+          const halfMax=0.40;
+          const cx=x.getPixelForValue(i);
+          const wpx=Math.abs(x.getPixelForValue(i+halfMax)-cx);
+          ctx.save();
+          ctx.beginPath();
+          dens.forEach((p,idx)=&gt;{
+            const py=y.getPixelForValue(p.v);
+            const w=(p.den/maxD)*wpx;
+            if(idx===0) ctx.moveTo(cx+w,py); else ctx.lineTo(cx+w,py);
+          });
+          for(let idx=dens.length-1; idx&gt;=0; idx--){
+            const py=y.getPixelForValue(dens[idx].v);
+            const w=(dens[idx].den/maxD)*wpx;
+            ctx.lineTo(cx-w,py);
+          }
+          ctx.closePath();
+          ctx.fillStyle=col; ctx.globalAlpha=0.16; ctx.fill();
+          ctx.globalAlpha=0.55; ctx.strokeStyle=col; ctx.lineWidth=1.25; ctx.stroke();
+          ctx.restore();
+        });
+      }
+    },{
+      id:&#x27;meanMarker&#x27;,
       afterDatasetsDraw(chart){
         const {ctx,scales:{x,y}}=chart;
         DRIVERS_PRESENT.forEach((d,i)=&gt;{
           const vals=ranges[d].vals; if(!vals.length) return;
-          const sorted=[...vals].sort((a,b)=&gt;a-b);
-          const mid=sorted.length%2? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
-          const mn=Math.min(...vals), mx=Math.max(...vals);
-          const px=x.getPixelForValue(i);
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/vals.length;
+          const px=x.getPixelForValue(i), py=y.getPixelForValue(mean);
           const col=driverHex(d);
-          // min-max range bar
           ctx.save();
-          ctx.strokeStyle=col; ctx.globalAlpha=.25; ctx.lineWidth=10;
-          ctx.beginPath(); ctx.moveTo(px,y.getPixelForValue(mn)); ctx.lineTo(px,y.getPixelForValue(mx)); ctx.stroke();
-          // median tick
-          ctx.globalAlpha=1; ctx.lineWidth=2.5;
-          ctx.beginPath(); ctx.moveTo(px-16,y.getPixelForValue(mid)); ctx.lineTo(px+16,y.getPixelForValue(mid)); ctx.stroke();
+          ctx.translate(px,py); ctx.rotate(Math.PI/4);
+          ctx.fillStyle=col; ctx.strokeStyle=cssVar(&#x27;--txt&#x27;); ctx.lineWidth=1.5;
+          const s=5;
+          ctx.fillRect(-s,-s,2*s,2*s); ctx.strokeRect(-s,-s,2*s,2*s);
           ctx.restore();
         });
       }
@@ -1403,7 +1484,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
         &lt;div class=&quot;chart-title&quot;&gt;Best Clean Lap · By Session&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;All sessions in date order · Off-pace laps excluded (&amp;gt;90s) · gold line marks race day&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;All sessions in date order · Off-pace laps excluded · top band shows track version · gold line marks race day&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;bestChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -1411,8 +1492,8 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;!-- CHART: avg 1st lap distribution --&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
-        &lt;div class=&quot;chart-title&quot;&gt;Avg 1st Lap · Run Distribution&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;Every run as one dot · Tick marks show per-driver median · Bars show min–max range&lt;/div&gt;
+        &lt;div class=&quot;chart-title&quot;&gt;Avg Clean Lap · Run Distribution&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;Each run as one dot · Shaded violin shows distribution density · Diamond marks the mean&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -1633,8 +1714,10 @@ function driverHex(d){ return cssVar(DRIVER_META[d].color); }        // resolved
 function isGrip(d){ return !!DRIVER_META[d].grip; }
 
 /* valid laps = times below outlier threshold; cleanBest = min valid time */
+
 function runValidTimes(run){ return run.times.filter(t=&gt;t&lt;OUTLIER); }
 function runCleanBest(run){ const v=runValidTimes(run); return v.length?Math.min(...v):null; }
+function runCleanAvg(run){ const v=runValidTimes(run); return v.length? v.reduce((a,b)=&gt;a+b,0)/v.length : null; }
 function runValidLapCount(run){ return runValidTimes(run).length; }
 
 function sessionCleanBest(s){
@@ -1747,7 +1830,7 @@ const raceDayPlugin = {
     if(firstPost===-1){
       // all sessions pre-race: label sits left of the right-edge line, rotated
       ctx.save();
-      ctx.translate(bx-4,top+6); ctx.rotate(0);
+      ctx.translate(bx-4,top+24); ctx.rotate(0);
       ctx.textAlign=&#x27;right&#x27;;
       ctx.fillText(txt,0,0);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
@@ -1755,10 +1838,47 @@ const raceDayPlugin = {
       ctx.restore();
     } else {
       ctx.textAlign=&#x27;left&#x27;;
-      ctx.fillText(txt,bx+5,top+6);
+      ctx.fillText(txt,bx+5,top+24);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
-      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+18);
+      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+36);
     }
+    ctx.restore();
+  }
+};
+
+
+/* ===== TRACK TIMELINE: version segments band across the top of the Best Lap chart ===== */
+const TL_PALETTE = [&#x27;--dim&#x27;,&#x27;--hawk&#x27;,&#x27;--accent&#x27;,&#x27;--koch&#x27;,&#x27;--saw&#x27;,&#x27;--crews&#x27;];
+const trackTimelinePlugin = {
+  id:&#x27;trackTimeline&#x27;,
+  beforeDatasetsDraw(chart){
+    const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
+    if(!ordered.length) return;
+    const {ctx,chartArea:{top,left,right},scales:{x}}=chart;
+    const versions=ordered.map(s=&gt;s.track.replace(&#x27;WatkinsGlen_&#x27;,&#x27;&#x27;).replace(/_AltSF$/,&#x27;&#x27;));
+    const segs=[]; let start=0;
+    for(let i=1;i&lt;=versions.length;i++){
+      if(i===versions.length || versions[i]!==versions[start]){
+        segs.push({ver:versions[start], from:start, to:i-1}); start=i;
+      }
+    }
+    // assign a stable color per distinct version (first-seen order)
+    const verColor={}; let ci=0;
+    segs.forEach(s=&gt;{ if(!(s.ver in verColor)){ verColor[s.ver]=TL_PALETTE[ci%TL_PALETTE.length]; ci++; } });
+    const bandH=14, bandTop=top+2;
+    ctx.save();
+    segs.forEach(seg=&gt;{
+      const x0 = seg.from===0 ? left : (x.getPixelForValue(seg.from-1)+x.getPixelForValue(seg.from))/2;
+      const x1 = seg.to===versions.length-1 ? right : (x.getPixelForValue(seg.to)+x.getPixelForValue(seg.to+1))/2;
+      const col = cssVar(verColor[seg.ver]||&#x27;--muted&#x27;);
+      ctx.globalAlpha=0.16; ctx.fillStyle=col; ctx.fillRect(x0,bandTop,x1-x0,bandH); ctx.globalAlpha=1;
+      ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x0,bandTop); ctx.lineTo(x1,bandTop); ctx.stroke();
+      if(x1-x0&gt;34){
+        ctx.fillStyle=col; ctx.font=&#x27;700 9px Barlow Condensed, sans-serif&#x27;;
+        ctx.textBaseline=&#x27;middle&#x27;; ctx.textAlign=&#x27;center&#x27;;
+        ctx.fillText(seg.ver, (x0+x1)/2, bandTop+bandH/2+0.5);
+      }
+    });
     ctx.restore();
   }
 };
@@ -1786,9 +1906,10 @@ function buildBestChart(){
   bestChartObj=new Chart(ctx,{
     type:&#x27;line&#x27;,
     data:{labels,datasets},
-    plugins:[raceDayPlugin],
+    plugins:[raceDayPlugin, trackTimelinePlugin],
     options:{
       responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:22}},
       interaction:{mode:&#x27;nearest&#x27;,intersect:true},
       plugins:{
         legend:{display:false},
@@ -1818,17 +1939,16 @@ function buildStripChart(){
 
   // build one scatter point per run: x = driver index, y = avg1
   // exclude pure-outlier runs and race-pace runs whose avg1 is far off clean qualifying pace
-  const AVG_OUTLIER = 76; // clean pace ~72s; rain runs (avg ~78-81) are excluded from this comparison
   const points=[]; const ranges={};
   DRIVERS_PRESENT.forEach((d,i)=&gt;{ ranges[d]={vals:[],i}; });
   SESSIONS.forEach(s=&gt;{
     s.runs.forEach(r=&gt;{
-      if(runCleanBest(r)===null) return;     // skip pure-outlier runs
-      if(r.avg1&gt;=AVG_OUTLIER) return;         // skip race-pace runs from qualifying-pace comparison
+      const cavg=runCleanAvg(r);             // mean of this run&#x27;s clean laps (off-laps excluded)
+      if(cavg===null) return;                // skip runs with no clean laps
       const i=DRIVERS_PRESENT.indexOf(s.driver);
       const jitter=(Math.random()-0.5)*0.34;
-      points.push({x:i+jitter, y:r.avg1, _d:s.driver, _s:s.date, _r:r.no, _v001:false});
-      ranges[s.driver].vals.push(r.avg1);
+      points.push({x:i+jitter, y:cavg, _d:s.driver, _s:s.date, _r:r.no, _v001:false});
+      ranges[s.driver].vals.push(cavg);
     });
   });
 
@@ -1860,27 +1980,69 @@ function buildStripChart(){
             grid:{color:grid} },
         y:{ ticks:{color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:11},callback:v=&gt;v.toFixed(1)},
             grid:{color:grid},
-            title:{display:true,text:&#x27;Avg 1st Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
+            title:{display:true,text:&#x27;Avg Clean Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
       }
     },
     plugins:[{
-      id:&#x27;medianTicks&#x27;,
+      id:&#x27;violin&#x27;,
+      beforeDatasetsDraw(chart){
+        const {ctx,scales:{x,y}}=chart;
+        DRIVERS_PRESENT.forEach((d,i)=&gt;{
+          const vals=ranges[d].vals; if(vals.length&lt;2) return;
+          const col=driverHex(d);
+          const sorted=[...vals].sort((a,b)=&gt;a-b);
+          const mn=Math.min(...vals), mx=Math.max(...vals);
+          const n=sorted.length;
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/n;
+          const sd=Math.sqrt(vals.reduce((a,b)=&gt;a+(b-mean)*(b-mean),0)/n) || 0.4;
+          const bw=Math.max(1.06*sd*Math.pow(n,-0.2), 0.18);
+          const pad=bw*1.5;
+          const lo=mn-pad, hi=mx+pad;
+          const STEPS=48;
+          const dens=[]; let maxD=0;
+          for(let k=0;k&lt;=STEPS;k++){
+            const v=lo+(hi-lo)*k/STEPS;
+            let sum=0;
+            for(let j=0;j&lt;n;j++){ const u=(v-sorted[j])/bw; sum+=Math.exp(-0.5*u*u); }
+            const den=sum/(n*bw*Math.sqrt(2*Math.PI));
+            dens.push({v,den}); if(den&gt;maxD) maxD=den;
+          }
+          if(maxD&lt;=0) return;
+          const halfMax=0.40;
+          const cx=x.getPixelForValue(i);
+          const wpx=Math.abs(x.getPixelForValue(i+halfMax)-cx);
+          ctx.save();
+          ctx.beginPath();
+          dens.forEach((p,idx)=&gt;{
+            const py=y.getPixelForValue(p.v);
+            const w=(p.den/maxD)*wpx;
+            if(idx===0) ctx.moveTo(cx+w,py); else ctx.lineTo(cx+w,py);
+          });
+          for(let idx=dens.length-1; idx&gt;=0; idx--){
+            const py=y.getPixelForValue(dens[idx].v);
+            const w=(dens[idx].den/maxD)*wpx;
+            ctx.lineTo(cx-w,py);
+          }
+          ctx.closePath();
+          ctx.fillStyle=col; ctx.globalAlpha=0.16; ctx.fill();
+          ctx.globalAlpha=0.55; ctx.strokeStyle=col; ctx.lineWidth=1.25; ctx.stroke();
+          ctx.restore();
+        });
+      }
+    },{
+      id:&#x27;meanMarker&#x27;,
       afterDatasetsDraw(chart){
         const {ctx,scales:{x,y}}=chart;
         DRIVERS_PRESENT.forEach((d,i)=&gt;{
           const vals=ranges[d].vals; if(!vals.length) return;
-          const sorted=[...vals].sort((a,b)=&gt;a-b);
-          const mid=sorted.length%2? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
-          const mn=Math.min(...vals), mx=Math.max(...vals);
-          const px=x.getPixelForValue(i);
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/vals.length;
+          const px=x.getPixelForValue(i), py=y.getPixelForValue(mean);
           const col=driverHex(d);
-          // min-max range bar
           ctx.save();
-          ctx.strokeStyle=col; ctx.globalAlpha=.25; ctx.lineWidth=10;
-          ctx.beginPath(); ctx.moveTo(px,y.getPixelForValue(mn)); ctx.lineTo(px,y.getPixelForValue(mx)); ctx.stroke();
-          // median tick
-          ctx.globalAlpha=1; ctx.lineWidth=2.5;
-          ctx.beginPath(); ctx.moveTo(px-16,y.getPixelForValue(mid)); ctx.lineTo(px+16,y.getPixelForValue(mid)); ctx.stroke();
+          ctx.translate(px,py); ctx.rotate(Math.PI/4);
+          ctx.fillStyle=col; ctx.strokeStyle=cssVar(&#x27;--txt&#x27;); ctx.lineWidth=1.5;
+          const s=5;
+          ctx.fillRect(-s,-s,2*s,2*s); ctx.strokeRect(-s,-s,2*s,2*s);
           ctx.restore();
         });
       }
@@ -2256,7 +2418,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
         &lt;h1&gt;San Diego&lt;em&gt;Lap Time Analysis&lt;/em&gt;&lt;/h1&gt;
       &lt;/div&gt;
       &lt;div class=&quot;header-stats&quot;&gt;
-        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-sessions&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-sessions&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-laps&quot;&gt;—&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Valid Laps&lt;/div&gt;&lt;/div&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; style=&quot;color:var(--accent)&quot; id=&quot;stat-best&quot;&gt;131.13&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Best Lap · Clean&lt;/div&gt;&lt;/div&gt;
       &lt;/div&gt;
@@ -2278,7 +2440,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
         &lt;div class=&quot;chart-title&quot;&gt;Best Clean Lap · By Session&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;All sessions in date order · Off-pace laps excluded (&amp;gt;150s) · gold line marks race day&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;Same grip level only · Taylor Gray (+5% grip) excluded · top band shows track version · gold line marks race day&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;bestChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -2286,8 +2448,8 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;!-- CHART: avg 1st lap distribution --&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
-        &lt;div class=&quot;chart-title&quot;&gt;Avg 1st Lap · Run Distribution&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;Every run as one dot · Tick marks show per-driver median · Bars show min–max range&lt;/div&gt;
+        &lt;div class=&quot;chart-title&quot;&gt;Avg Clean Lap · Run Distribution&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;Each run as one dot · v001 laps excluded · Shaded violin shows density · Diamond marks the mean&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -4592,6 +4754,142 @@ const SESSIONS = [
     &quot;comment&quot;: &quot;&quot;
    }
   ]
+ },
+ {
+  &quot;id&quot;: &quot;20260617_NOS_SAN_JGR20_DS&quot;,
+  &quot;driver&quot;: &quot;Brandon Jones&quot;,
+  &quot;car&quot;: &quot;JGR20&quot;,
+  &quot;date&quot;: &quot;Jun 17&quot;,
+  &quot;dateSort&quot;: 20260617,
+  &quot;track&quot;: &quot;SanDiego_v102&quot;,
+  &quot;sim&quot;: &quot;GTX&quot;,
+  &quot;tire&quot;: &quot;25CSC1_o05&quot;,
+  &quot;totalLaps&quot;: 42,
+  &quot;note&quot;: null,
+  &quot;runs&quot;: [
+   {
+    &quot;no&quot;: 1,
+    &quot;desc&quot;: &quot;Test&quot;,
+    &quot;avg1&quot;: 139.66,
+    &quot;avg2&quot;: 139.66,
+    &quot;laps&quot;: 3,
+    &quot;times&quot;: [
+     142.69,
+     136.63
+    ],
+    &quot;comment&quot;: &quot;Test&quot;
+   },
+   {
+    &quot;no&quot;: 2,
+    &quot;desc&quot;: &quot;test&quot;,
+    &quot;avg1&quot;: 135.51,
+    &quot;avg2&quot;: 137.7,
+    &quot;laps&quot;: 6,
+    &quot;times&quot;: [
+     144.35,
+     137.6,
+     135.53,
+     135.59,
+     135.41
+    ],
+    &quot;comment&quot;: &quot;&quot;
+   },
+   {
+    &quot;no&quot;: 3,
+    &quot;desc&quot;: &quot;B.Jones in&quot;,
+    &quot;avg1&quot;: null,
+    &quot;avg2&quot;: null,
+    &quot;laps&quot;: 0,
+    &quot;times&quot;: [],
+    &quot;comment&quot;: &quot;&quot;
+   },
+   {
+    &quot;no&quot;: 4,
+    &quot;desc&quot;: &quot;Run 3, NW in&quot;,
+    &quot;avg1&quot;: 133.25,
+    &quot;avg2&quot;: 134.8,
+    &quot;laps&quot;: 6,
+    &quot;times&quot;: [
+     140.62,
+     133.64,
+     133.07,
+     133.32,
+     133.36
+    ],
+    &quot;comment&quot;: &quot;Helped with a little rear grip but took a little front turn with it — helped one thing to hurt another, kind of a wash for pace. Better first half, worse second half with tighter corners.&quot;
+   },
+   {
+    &quot;no&quot;: 5,
+    &quot;desc&quot;: &quot;Run 4, PSI change&quot;,
+    &quot;avg1&quot;: 132.61,
+    &quot;avg2&quot;: 132.82,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     139.4,
+     133.15,
+     132.67,
+     179.84,
+     133.14,
+     132.83,
+     132.33
+    ],
+    &quot;comment&quot;: &quot;Found something in the Chicane. Decent overall change for front to rear. Tighter in T1 compared to last week.&quot;
+   },
+   {
+    &quot;no&quot;: 6,
+    &quot;desc&quot;: &quot;Run 5, softer BS&quot;,
+    &quot;avg1&quot;: 134.53,
+    &quot;avg2&quot;: 137.76,
+    &quot;laps&quot;: 8,
+    &quot;times&quot;: [
+     159.89,
+     132.78,
+     132.5,
+     138.31,
+     142.14,
+     143.06,
+     146.79
+    ],
+    &quot;comment&quot;: &quot;End lap 6 / start lap 7 hot pit in (did it twice). Made the front turn better but disconnected the back end a bit — potential speed gain but felt sloppy. Getting through T1 better. Worst corner is the switchback before T12.&quot;
+   },
+   {
+    &quot;no&quot;: 7,
+    &quot;desc&quot;: &quot;Run 6, drop rear psi&quot;,
+    &quot;avg1&quot;: null,
+    &quot;avg2&quot;: null,
+    &quot;laps&quot;: 1,
+    &quot;times&quot;: [],
+    &quot;comment&quot;: &quot;Server crashed.&quot;
+   },
+   {
+    &quot;no&quot;: 8,
+    &quot;desc&quot;: &quot;Rerun run 7&quot;,
+    &quot;avg1&quot;: 135.86,
+    &quot;avg2&quot;: 138.49,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     138.59,
+     146.36,
+     136.51,
+     132.48
+    ],
+    &quot;comment&quot;: &quot;Gain in front tires is the whole corner; rear grip loose on exit.&quot;
+   },
+   {
+    &quot;no&quot;: 9,
+    &quot;desc&quot;: &quot;Run 8, less RR camber&quot;,
+    &quot;avg1&quot;: 132.91,
+    &quot;avg2&quot;: 134.3,
+    &quot;laps&quot;: 5,
+    &quot;times&quot;: [
+     138.45,
+     134.07,
+     132.67,
+     132
+    ],
+    &quot;comment&quot;: &quot;Best change — getting the car synced up. A lot of the high-speed stuff was really positive, T1/3/4 nice. 2-3 tenths better in T1 this run.&quot;
+   }
+  ]
  }
 ];
 
@@ -4606,8 +4904,10 @@ function isGrip(d){ return !!DRIVER_META[d].grip; }
 function isHeadlineVersion(track){ return /v101|v102/.test(track); }
 
 /* valid laps = times below outlier threshold; cleanBest = min valid time */
+
 function runValidTimes(run){ return run.times.filter(t=&gt;t&lt;OUTLIER); }
 function runCleanBest(run){ const v=runValidTimes(run); return v.length?Math.min(...v):null; }
+function runCleanAvg(run){ const v=runValidTimes(run); return v.length? v.reduce((a,b)=&gt;a+b,0)/v.length : null; }
 function runValidLapCount(run){ return runValidTimes(run).length; }
 
 function sessionCleanBest(s){
@@ -4693,7 +4993,8 @@ const RACE_LABEL = &#x27;Jun 20&#x27;;      // human-readable race date
 const raceDayPlugin = {
   id:&#x27;raceDay&#x27;,
   beforeDatasetsDraw(chart){
-    const ordered=[...SESSIONS].sort((a,b)=&gt;a.dateSort-b.dateSort);
+    // match the chart&#x27;s x-axis: grip-flagged sessions are excluded
+    const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
     // index of first post-race session
     let firstPost=-1;
     for(let i=0;i&lt;ordered.length;i++){ if(ordered[i].dateSort&gt;RACE_SORT){ firstPost=i; break; } }
@@ -4725,7 +5026,7 @@ const raceDayPlugin = {
     if(firstPost===-1){
       // all sessions pre-race: label sits left of the right-edge line, rotated
       ctx.save();
-      ctx.translate(bx-4,top+6); ctx.rotate(0);
+      ctx.translate(bx-4,top+24); ctx.rotate(0);
       ctx.textAlign=&#x27;right&#x27;;
       ctx.fillText(txt,0,0);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
@@ -4733,22 +5034,70 @@ const raceDayPlugin = {
       ctx.restore();
     } else {
       ctx.textAlign=&#x27;left&#x27;;
-      ctx.fillText(txt,bx+5,top+6);
+      ctx.fillText(txt,bx+5,top+24);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
-      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+18);
+      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+36);
     }
     ctx.restore();
   }
 };
 
+/* ===== TRACK TIMELINE: version segments band across the top of the Best Lap chart ===== */
+const TRACK_VER_COLORS = {
+  &#x27;v001&#x27;:&#x27;--dim&#x27;, &#x27;v101&#x27;:&#x27;--hawk&#x27;, &#x27;v102&#x27;:&#x27;--accent&#x27;, &#x27;v102_AltSF&#x27;:&#x27;--koch&#x27;
+};
+const trackTimelinePlugin = {
+  id:&#x27;trackTimeline&#x27;,
+  beforeDatasetsDraw(chart){
+    const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
+    if(!ordered.length) return;
+    const {ctx,chartArea:{top,left,right},scales:{x}}=chart;
+    const versions=ordered.map(s=&gt;s.track.replace(&#x27;SanDiego_&#x27;,&#x27;&#x27;).replace(&#x27;v102_AltSF&#x27;,&#x27;v102&#x27;));
+    // build contiguous segments of identical version
+    const segs=[]; let start=0;
+    for(let i=1;i&lt;=versions.length;i++){
+      if(i===versions.length || versions[i]!==versions[start]){
+        segs.push({ver:versions[start], from:start, to:i-1}); start=i;
+      }
+    }
+    const bandH=14, bandTop=top+2;
+    ctx.save();
+    segs.forEach(seg=&gt;{
+      // x extent: midway before first and after last point of the segment
+      const x0 = seg.from===0 ? left : (x.getPixelForValue(seg.from-1)+x.getPixelForValue(seg.from))/2;
+      const x1 = seg.to===versions.length-1 ? right : (x.getPixelForValue(seg.to)+x.getPixelForValue(seg.to+1))/2;
+      const col = cssVar(TRACK_VER_COLORS[seg.ver]||&#x27;--muted&#x27;);
+      // tinted bar
+      ctx.globalAlpha=0.16; ctx.fillStyle=col;
+      ctx.fillRect(x0,bandTop,x1-x0,bandH);
+      ctx.globalAlpha=1;
+      // top accent line
+      ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
+      ctx.moveTo(x0,bandTop); ctx.lineTo(x1,bandTop); ctx.stroke();
+      // label (only if segment wide enough)
+      if(x1-x0&gt;34){
+        ctx.fillStyle=col; ctx.font=&#x27;700 9px Barlow Condensed, sans-serif&#x27;;
+        ctx.textBaseline=&#x27;middle&#x27;; ctx.textAlign=&#x27;center&#x27;;
+        ctx.fillText(seg.ver, (x0+x1)/2, bandTop+bandH/2+0.5);
+      }
+    });
+    ctx.restore();
+  }
+};
+
+
 function buildBestChart(){
   const ctx=document.getElementById(&#x27;bestChart&#x27;);
   const tick=cssVar(&#x27;--dim&#x27;), grid=cssVar(&#x27;--line&#x27;), panel=cssVar(&#x27;--panel&#x27;);
-  const ordered=[...SESSIONS].sort((a,b)=&gt;a.dateSort-b.dateSort);
-  const labels=ordered.map(s=&gt;[s.date, s.track.replace(&#x27;SanDiego_&#x27;,&#x27;&#x27;)]);
+  // exclude grip-flagged sessions (Taylor Gray, +5% grip) so the chart shows only
+  // cars running the same grip level — no blank columns for Gray-only sessions
+  const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
+  const labels=ordered.map(s=&gt;s.date);
 
   // one dataset per driver, points only where they ran
-  const datasets=DRIVERS_PRESENT.map(d=&gt;{
+  // grip-flagged drivers (e.g. Taylor Gray, +5% grip) are excluded here so the
+  // chart reflects real pace among cars running the same grip level
+  const datasets=DRIVERS_PRESENT.filter(d=&gt;!isGrip(d)).map(d=&gt;{
     const data=ordered.map(s=&gt; s.driver===d ? sessionCleanBest(s) : null);
     const hex=driverHex(d);
     return {
@@ -4764,9 +5113,10 @@ function buildBestChart(){
   bestChartObj=new Chart(ctx,{
     type:&#x27;line&#x27;,
     data:{labels,datasets},
-    plugins:[raceDayPlugin],
+    plugins:[raceDayPlugin, trackTimelinePlugin],
     options:{
       responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:22}},
       interaction:{mode:&#x27;nearest&#x27;,intersect:true},
       plugins:{
         legend:{display:false},
@@ -4796,17 +5146,17 @@ function buildStripChart(){
 
   // build one scatter point per run: x = driver index, y = avg1
   // exclude pure-outlier runs and race-pace runs whose avg1 is far off clean qualifying pace
-  const AVG_OUTLIER = 150; // clean pace ~131-135s; excludes runs whose avg1 is inflated by an excluded out-lap
   const points=[]; const ranges={};
   DRIVERS_PRESENT.forEach((d,i)=&gt;{ ranges[d]={vals:[],i}; });
   SESSIONS.forEach(s=&gt;{
+    if(/v001/.test(s.track)) return;         // exclude early v001 development laps (higher-grip track version)
     s.runs.forEach(r=&gt;{
-      if(runCleanBest(r)===null) return;     // skip pure-outlier runs
-      if(r.avg1&gt;=AVG_OUTLIER) return;         // skip race-pace runs from qualifying-pace comparison
+      const cavg=runCleanAvg(r);             // mean of this run&#x27;s clean laps (off-laps excluded)
+      if(cavg===null) return;                // skip runs with no clean laps
       const i=DRIVERS_PRESENT.indexOf(s.driver);
       const jitter=(Math.random()-0.5)*0.34;
-      points.push({x:i+jitter, y:r.avg1, _d:s.driver, _s:s.date, _r:r.no});
-      ranges[s.driver].vals.push(r.avg1);
+      points.push({x:i+jitter, y:cavg, _d:s.driver, _s:s.date, _r:r.no});
+      ranges[s.driver].vals.push(cavg);
     });
   });
 
@@ -4838,27 +5188,73 @@ function buildStripChart(){
             grid:{color:grid} },
         y:{ ticks:{color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:11},callback:v=&gt;v.toFixed(1)},
             grid:{color:grid},
-            title:{display:true,text:&#x27;Avg 1st Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
+            title:{display:true,text:&#x27;Avg Clean Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
       }
     },
     plugins:[{
-      id:&#x27;medianTicks&#x27;,
+      id:&#x27;violin&#x27;,
+      beforeDatasetsDraw(chart){
+        const {ctx,scales:{x,y},chartArea}=chart;
+        DRIVERS_PRESENT.forEach((d,i)=&gt;{
+          const vals=ranges[d].vals; if(vals.length&lt;2) return;
+          const col=driverHex(d);
+          const sorted=[...vals].sort((a,b)=&gt;a-b);
+          const mn=Math.min(...vals), mx=Math.max(...vals);
+          // kernel density estimate over the value range (Gaussian kernel)
+          const n=sorted.length;
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/n;
+          const sd=Math.sqrt(vals.reduce((a,b)=&gt;a+(b-mean)*(b-mean),0)/n) || 0.4;
+          // Silverman&#x27;s rule of thumb for bandwidth, with a sensible floor
+          const bw=Math.max(1.06*sd*Math.pow(n,-0.2), 0.18);
+          const pad=bw*1.5;
+          const lo=mn-pad, hi=mx+pad;
+          const STEPS=48;
+          const dens=[]; let maxD=0;
+          for(let k=0;k&lt;=STEPS;k++){
+            const v=lo+(hi-lo)*k/STEPS;
+            let sum=0;
+            for(let j=0;j&lt;n;j++){ const u=(v-sorted[j])/bw; sum+=Math.exp(-0.5*u*u); }
+            const den=sum/(n*bw*Math.sqrt(2*Math.PI));
+            dens.push({v,den}); if(den&gt;maxD) maxD=den;
+          }
+          if(maxD&lt;=0) return;
+          const halfMax=0.40; // max half-width in x-units (category spacing is 1)
+          const cx=x.getPixelForValue(i);
+          const wpx=Math.abs(x.getPixelForValue(i+halfMax)-cx);
+          // build violin outline (right side down, left side up)
+          ctx.save();
+          ctx.beginPath();
+          dens.forEach((p,idx)=&gt;{
+            const py=y.getPixelForValue(p.v);
+            const w=(p.den/maxD)*wpx;
+            if(idx===0) ctx.moveTo(cx+w,py); else ctx.lineTo(cx+w,py);
+          });
+          for(let idx=dens.length-1; idx&gt;=0; idx--){
+            const py=y.getPixelForValue(dens[idx].v);
+            const w=(dens[idx].den/maxD)*wpx;
+            ctx.lineTo(cx-w,py);
+          }
+          ctx.closePath();
+          ctx.fillStyle=col; ctx.globalAlpha=0.16; ctx.fill();
+          ctx.globalAlpha=0.55; ctx.strokeStyle=col; ctx.lineWidth=1.25; ctx.stroke();
+          ctx.restore();
+        });
+      }
+    },{
+      id:&#x27;meanMarker&#x27;,
       afterDatasetsDraw(chart){
         const {ctx,scales:{x,y}}=chart;
         DRIVERS_PRESENT.forEach((d,i)=&gt;{
           const vals=ranges[d].vals; if(!vals.length) return;
-          const sorted=[...vals].sort((a,b)=&gt;a-b);
-          const mid=sorted.length%2? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
-          const mn=Math.min(...vals), mx=Math.max(...vals);
-          const px=x.getPixelForValue(i);
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/vals.length;
+          const px=x.getPixelForValue(i), py=y.getPixelForValue(mean);
           const col=driverHex(d);
-          // min-max range bar
+          // mean marker: filled diamond with a light ring for contrast
           ctx.save();
-          ctx.strokeStyle=col; ctx.globalAlpha=.25; ctx.lineWidth=10;
-          ctx.beginPath(); ctx.moveTo(px,y.getPixelForValue(mn)); ctx.lineTo(px,y.getPixelForValue(mx)); ctx.stroke();
-          // median tick
-          ctx.globalAlpha=1; ctx.lineWidth=2.5;
-          ctx.beginPath(); ctx.moveTo(px-16,y.getPixelForValue(mid)); ctx.lineTo(px+16,y.getPixelForValue(mid)); ctx.stroke();
+          ctx.translate(px,py); ctx.rotate(Math.PI/4);
+          ctx.fillStyle=col; ctx.strokeStyle=cssVar(&#x27;--txt&#x27;); ctx.lineWidth=1.5;
+          const s=5;
+          ctx.fillRect(-s,-s,2*s,2*s); ctx.strokeRect(-s,-s,2*s,2*s);
           ctx.restore();
         });
       }
@@ -5248,7 +5644,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
       &lt;div class=&quot;header-stats&quot;&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-sessions&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
         &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;stat-laps&quot;&gt;—&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Valid Laps&lt;/div&gt;&lt;/div&gt;
-        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; style=&quot;color:var(--accent)&quot; id=&quot;stat-best&quot;&gt;76.17&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Best Lap · Clean&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; style=&quot;color:var(--accent)&quot; id=&quot;stat-best&quot;&gt;76.75&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Best Lap · Clean&lt;/div&gt;&lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
@@ -5268,7 +5664,7 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
         &lt;div class=&quot;chart-title&quot;&gt;Best Clean Lap · By Session&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;All sessions in date order · Off-pace laps excluded (&amp;gt;90s) · gold line marks race day&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;Same grip level only · Taylor Gray (+5% grip) excluded · top band shows track version · gold line marks race day&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;bestChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -5276,8 +5672,8 @@ h1 em{font-style:normal;color:var(--muted);font-weight:600;display:block}
     &lt;!-- CHART: avg 1st lap distribution --&gt;
     &lt;div class=&quot;chart-card&quot;&gt;
       &lt;div class=&quot;chart-header&quot;&gt;
-        &lt;div class=&quot;chart-title&quot;&gt;Avg 1st Lap · Run Distribution&lt;/div&gt;
-        &lt;div class=&quot;chart-sub&quot;&gt;Every run as one dot · Tick marks show per-driver median · Bars show min–max range&lt;/div&gt;
+        &lt;div class=&quot;chart-title&quot;&gt;Avg Clean Lap · Run Distribution&lt;/div&gt;
+        &lt;div class=&quot;chart-sub&quot;&gt;Each run as one dot · Shaded violin shows distribution density · Diamond marks the mean&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;stripChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -5298,7 +5694,7 @@ const DRIVER_META = {
   &#x27;William Sawalich&#x27;: {key:&#x27;saw&#x27;,   color:&#x27;var(--saw)&#x27;},
   &#x27;Brent Crews&#x27;:      {key:&#x27;crews&#x27;, color:&#x27;var(--crews)&#x27;},
   &#x27;Brandon Jones&#x27;:    {key:&#x27;jones&#x27;, color:&#x27;var(--jones)&#x27;},
-  &#x27;Taylor Gray&#x27;:      {key:&#x27;gray&#x27;,  color:&#x27;var(--gray)&#x27;},
+  &#x27;Taylor Gray&#x27;:      {key:&#x27;gray&#x27;,  color:&#x27;var(--gray)&#x27;, grip:true},
   &#x27;Jack Hawksworth&#x27;:  {key:&#x27;hawk&#x27;,  color:&#x27;var(--hawk)&#x27;},
   &#x27;Blake Koch&#x27;:       {key:&#x27;koch&#x27;,  color:&#x27;var(--koch)&#x27;}
 };
@@ -6065,8 +6461,10 @@ function driverHex(d){ return cssVar(DRIVER_META[d].color); }        // resolved
 function isGrip(d){ return !!DRIVER_META[d].grip; }
 
 /* valid laps = times below outlier threshold; cleanBest = min valid time */
+
 function runValidTimes(run){ return run.times.filter(t=&gt;t&lt;OUTLIER); }
 function runCleanBest(run){ const v=runValidTimes(run); return v.length?Math.min(...v):null; }
+function runCleanAvg(run){ const v=runValidTimes(run); return v.length? v.reduce((a,b)=&gt;a+b,0)/v.length : null; }
 function runValidLapCount(run){ return runValidTimes(run).length; }
 
 function sessionCleanBest(s){
@@ -6100,7 +6498,7 @@ function renderSummary(){
     cards.push(`&lt;div class=&quot;summary-card&quot;&gt;&lt;div class=&quot;summary-card-bar&quot;&gt;&lt;/div&gt;
       &lt;div class=&quot;summary-label&quot;&gt;Best Clean Lap&lt;/div&gt;
       &lt;div class=&quot;summary-val&quot; style=&quot;color:${driverColor(cleanBest.driver)}&quot;&gt;${cleanBest.time.toFixed(2)}&lt;/div&gt;
-      &lt;div class=&quot;summary-sub&quot;&gt;${cleanBest.driver} · ${cleanBest.session} Run ${cleanBest.run}&lt;br&gt;off-pace laps excluded&lt;/div&gt;&lt;/div&gt;`);
+      &lt;div class=&quot;summary-sub&quot;&gt;${cleanBest.driver} · ${cleanBest.session} Run ${cleanBest.run}&lt;br&gt;excl. Gray (+5% grip)&lt;/div&gt;&lt;/div&gt;`);
   }
 
   // best run avg (lowest avg 1st-lap across valid runs)
@@ -6149,7 +6547,7 @@ const RACE_LABEL = &#x27;Jun 27&#x27;;      // human-readable race date
 const raceDayPlugin = {
   id:&#x27;raceDay&#x27;,
   beforeDatasetsDraw(chart){
-    const ordered=[...SESSIONS].sort((a,b)=&gt;a.dateSort-b.dateSort);
+    const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
     // index of first post-race session
     let firstPost=-1;
     for(let i=0;i&lt;ordered.length;i++){ if(ordered[i].dateSort&gt;RACE_SORT){ firstPost=i; break; } }
@@ -6181,7 +6579,7 @@ const raceDayPlugin = {
     if(firstPost===-1){
       // all sessions pre-race: label sits left of the right-edge line, rotated
       ctx.save();
-      ctx.translate(bx-4,top+6); ctx.rotate(0);
+      ctx.translate(bx-4,top+24); ctx.rotate(0);
       ctx.textAlign=&#x27;right&#x27;;
       ctx.fillText(txt,0,0);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
@@ -6189,10 +6587,47 @@ const raceDayPlugin = {
       ctx.restore();
     } else {
       ctx.textAlign=&#x27;left&#x27;;
-      ctx.fillText(txt,bx+5,top+6);
+      ctx.fillText(txt,bx+5,top+24);
       ctx.fillStyle=cssVar(&#x27;--dim&#x27;); ctx.font=&#x27;400 8px Barlow Condensed, sans-serif&#x27;;
-      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+18);
+      ctx.fillText(&#x27;post-race sessions →&#x27;,bx+5,top+36);
     }
+    ctx.restore();
+  }
+};
+
+
+/* ===== TRACK TIMELINE: version segments band across the top of the Best Lap chart ===== */
+const TL_PALETTE = [&#x27;--dim&#x27;,&#x27;--hawk&#x27;,&#x27;--accent&#x27;,&#x27;--koch&#x27;,&#x27;--saw&#x27;,&#x27;--crews&#x27;];
+const trackTimelinePlugin = {
+  id:&#x27;trackTimeline&#x27;,
+  beforeDatasetsDraw(chart){
+    const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
+    if(!ordered.length) return;
+    const {ctx,chartArea:{top,left,right},scales:{x}}=chart;
+    const versions=ordered.map(s=&gt;s.track.replace(&#x27;Sonoma_&#x27;,&#x27;&#x27;).replace(/_AltSF$/,&#x27;&#x27;));
+    const segs=[]; let start=0;
+    for(let i=1;i&lt;=versions.length;i++){
+      if(i===versions.length || versions[i]!==versions[start]){
+        segs.push({ver:versions[start], from:start, to:i-1}); start=i;
+      }
+    }
+    // assign a stable color per distinct version (first-seen order)
+    const verColor={}; let ci=0;
+    segs.forEach(s=&gt;{ if(!(s.ver in verColor)){ verColor[s.ver]=TL_PALETTE[ci%TL_PALETTE.length]; ci++; } });
+    const bandH=14, bandTop=top+2;
+    ctx.save();
+    segs.forEach(seg=&gt;{
+      const x0 = seg.from===0 ? left : (x.getPixelForValue(seg.from-1)+x.getPixelForValue(seg.from))/2;
+      const x1 = seg.to===versions.length-1 ? right : (x.getPixelForValue(seg.to)+x.getPixelForValue(seg.to+1))/2;
+      const col = cssVar(verColor[seg.ver]||&#x27;--muted&#x27;);
+      ctx.globalAlpha=0.16; ctx.fillStyle=col; ctx.fillRect(x0,bandTop,x1-x0,bandH); ctx.globalAlpha=1;
+      ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x0,bandTop); ctx.lineTo(x1,bandTop); ctx.stroke();
+      if(x1-x0&gt;34){
+        ctx.fillStyle=col; ctx.font=&#x27;700 9px Barlow Condensed, sans-serif&#x27;;
+        ctx.textBaseline=&#x27;middle&#x27;; ctx.textAlign=&#x27;center&#x27;;
+        ctx.fillText(seg.ver, (x0+x1)/2, bandTop+bandH/2+0.5);
+      }
+    });
     ctx.restore();
   }
 };
@@ -6200,11 +6635,15 @@ const raceDayPlugin = {
 function buildBestChart(){
   const ctx=document.getElementById(&#x27;bestChart&#x27;);
   const tick=cssVar(&#x27;--dim&#x27;), grid=cssVar(&#x27;--line&#x27;), panel=cssVar(&#x27;--panel&#x27;);
-  const ordered=[...SESSIONS].sort((a,b)=&gt;a.dateSort-b.dateSort);
-  const labels=ordered.map(s=&gt;[s.date, s.track.replace(&#x27;Sonoma_&#x27;,&#x27;&#x27;)]);
+  // exclude grip-flagged sessions (Taylor Gray, +5% grip) so the chart shows only
+  // cars running the same grip level — no blank columns for Gray-only sessions
+  const ordered=[...SESSIONS].filter(s=&gt;!isGrip(s.driver)).sort((a,b)=&gt;a.dateSort-b.dateSort);
+  const labels=ordered.map(s=&gt;s.date);
 
   // one dataset per driver, points only where they ran
-  const datasets=DRIVERS_PRESENT.map(d=&gt;{
+  // grip-flagged drivers (e.g. Taylor Gray, +5% grip) are excluded so the chart
+  // reflects real pace among cars running the same grip level
+  const datasets=DRIVERS_PRESENT.filter(d=&gt;!isGrip(d)).map(d=&gt;{
     const data=ordered.map(s=&gt; s.driver===d ? sessionCleanBest(s) : null);
     const hex=driverHex(d);
     return {
@@ -6220,9 +6659,10 @@ function buildBestChart(){
   bestChartObj=new Chart(ctx,{
     type:&#x27;line&#x27;,
     data:{labels,datasets},
-    plugins:[raceDayPlugin],
+    plugins:[raceDayPlugin, trackTimelinePlugin],
     options:{
       responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:22}},
       interaction:{mode:&#x27;nearest&#x27;,intersect:true},
       plugins:{
         legend:{display:false},
@@ -6252,17 +6692,16 @@ function buildStripChart(){
 
   // build one scatter point per run: x = driver index, y = avg1
   // exclude pure-outlier runs and race-pace runs whose avg1 is far off clean qualifying pace
-  const AVG_OUTLIER = 80; // clean qualifying pace ~76-78s; excludes race-pace and runs whose avg1 is inflated by an excluded out-lap
   const points=[]; const ranges={};
   DRIVERS_PRESENT.forEach((d,i)=&gt;{ ranges[d]={vals:[],i}; });
   SESSIONS.forEach(s=&gt;{
     s.runs.forEach(r=&gt;{
-      if(runCleanBest(r)===null) return;     // skip pure-outlier runs
-      if(r.avg1&gt;=AVG_OUTLIER) return;         // skip race-pace runs from qualifying-pace comparison
+      const cavg=runCleanAvg(r);             // mean of this run&#x27;s clean laps (off-laps excluded)
+      if(cavg===null) return;                // skip runs with no clean laps
       const i=DRIVERS_PRESENT.indexOf(s.driver);
       const jitter=(Math.random()-0.5)*0.34;
-      points.push({x:i+jitter, y:r.avg1, _d:s.driver, _s:s.date, _r:r.no});
-      ranges[s.driver].vals.push(r.avg1);
+      points.push({x:i+jitter, y:cavg, _d:s.driver, _s:s.date, _r:r.no});
+      ranges[s.driver].vals.push(cavg);
     });
   });
 
@@ -6294,27 +6733,69 @@ function buildStripChart(){
             grid:{color:grid} },
         y:{ ticks:{color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:11},callback:v=&gt;v.toFixed(1)},
             grid:{color:grid},
-            title:{display:true,text:&#x27;Avg 1st Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
+            title:{display:true,text:&#x27;Avg Clean Lap (s)&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}} }
       }
     },
     plugins:[{
-      id:&#x27;medianTicks&#x27;,
+      id:&#x27;violin&#x27;,
+      beforeDatasetsDraw(chart){
+        const {ctx,scales:{x,y}}=chart;
+        DRIVERS_PRESENT.forEach((d,i)=&gt;{
+          const vals=ranges[d].vals; if(vals.length&lt;2) return;
+          const col=driverHex(d);
+          const sorted=[...vals].sort((a,b)=&gt;a-b);
+          const mn=Math.min(...vals), mx=Math.max(...vals);
+          const n=sorted.length;
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/n;
+          const sd=Math.sqrt(vals.reduce((a,b)=&gt;a+(b-mean)*(b-mean),0)/n) || 0.4;
+          const bw=Math.max(1.06*sd*Math.pow(n,-0.2), 0.18);
+          const pad=bw*1.5;
+          const lo=mn-pad, hi=mx+pad;
+          const STEPS=48;
+          const dens=[]; let maxD=0;
+          for(let k=0;k&lt;=STEPS;k++){
+            const v=lo+(hi-lo)*k/STEPS;
+            let sum=0;
+            for(let j=0;j&lt;n;j++){ const u=(v-sorted[j])/bw; sum+=Math.exp(-0.5*u*u); }
+            const den=sum/(n*bw*Math.sqrt(2*Math.PI));
+            dens.push({v,den}); if(den&gt;maxD) maxD=den;
+          }
+          if(maxD&lt;=0) return;
+          const halfMax=0.40;
+          const cx=x.getPixelForValue(i);
+          const wpx=Math.abs(x.getPixelForValue(i+halfMax)-cx);
+          ctx.save();
+          ctx.beginPath();
+          dens.forEach((p,idx)=&gt;{
+            const py=y.getPixelForValue(p.v);
+            const w=(p.den/maxD)*wpx;
+            if(idx===0) ctx.moveTo(cx+w,py); else ctx.lineTo(cx+w,py);
+          });
+          for(let idx=dens.length-1; idx&gt;=0; idx--){
+            const py=y.getPixelForValue(dens[idx].v);
+            const w=(dens[idx].den/maxD)*wpx;
+            ctx.lineTo(cx-w,py);
+          }
+          ctx.closePath();
+          ctx.fillStyle=col; ctx.globalAlpha=0.16; ctx.fill();
+          ctx.globalAlpha=0.55; ctx.strokeStyle=col; ctx.lineWidth=1.25; ctx.stroke();
+          ctx.restore();
+        });
+      }
+    },{
+      id:&#x27;meanMarker&#x27;,
       afterDatasetsDraw(chart){
         const {ctx,scales:{x,y}}=chart;
         DRIVERS_PRESENT.forEach((d,i)=&gt;{
           const vals=ranges[d].vals; if(!vals.length) return;
-          const sorted=[...vals].sort((a,b)=&gt;a-b);
-          const mid=sorted.length%2? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
-          const mn=Math.min(...vals), mx=Math.max(...vals);
-          const px=x.getPixelForValue(i);
+          const mean=vals.reduce((a,b)=&gt;a+b,0)/vals.length;
+          const px=x.getPixelForValue(i), py=y.getPixelForValue(mean);
           const col=driverHex(d);
-          // min-max range bar
           ctx.save();
-          ctx.strokeStyle=col; ctx.globalAlpha=.25; ctx.lineWidth=10;
-          ctx.beginPath(); ctx.moveTo(px,y.getPixelForValue(mn)); ctx.lineTo(px,y.getPixelForValue(mx)); ctx.stroke();
-          // median tick
-          ctx.globalAlpha=1; ctx.lineWidth=2.5;
-          ctx.beginPath(); ctx.moveTo(px-16,y.getPixelForValue(mid)); ctx.lineTo(px+16,y.getPixelForValue(mid)); ctx.stroke();
+          ctx.translate(px,py); ctx.rotate(Math.PI/4);
+          ctx.fillStyle=col; ctx.strokeStyle=cssVar(&#x27;--txt&#x27;); ctx.lineWidth=1.5;
+          const s=5;
+          ctx.fillRect(-s,-s,2*s,2*s); ctx.strokeRect(-s,-s,2*s,2*s);
           ctx.restore();
         });
       }
