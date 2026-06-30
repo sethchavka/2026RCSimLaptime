@@ -174,6 +174,7 @@
       </div>
     </div>
     <div class="track-tabs" role="tablist" aria-label="Track selection">
+      <button class="track-tab" data-tab="overview" data-num="00" role="tab" aria-selected="false" aria-controls="panel-overview">Overview</button>
       <button class="track-tab" data-tab="cota" data-num="03" role="tab" aria-selected="false" aria-controls="panel-cota">COTA</button>
       <button class="track-tab" data-tab="watkins" data-num="13" role="tab" aria-selected="false" aria-controls="panel-watkins">Watkins Glen</button>
       <button class="track-tab" data-tab="sandiego" data-num="18" role="tab" aria-selected="false" aria-controls="panel-sandiego">San Diego</button>
@@ -182,7 +183,490 @@
   </div>
 
   <div class="stage" id="stage">
-    <div class="track-panel" id="panel-cota" role="tabpanel" data-tab="cota"><iframe class="track-frame" data-srcdoc="&lt;!DOCTYPE html&gt;
+    <div class="track-panel" id="panel-overview" role="tabpanel" data-tab="overview"><iframe class="track-frame" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;script&gt;try{sessionStorage.setItem(&#x27;overview_auth&#x27;,&#x27;1&#x27;);}catch(e){}&lt;/script&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Program Overview — Lap Time Analysis&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;style&gt;
+  :root{
+    --bg:#0a0d12; --panel:#11151c; --panel2:#161b24; --line:#222a35; --line2:#2d3744;
+    --txt:#eef1f6; --muted:#94a1b2; --dim:#5d6b7d;
+    --accent:#e6b84f;
+    --saw:#a472e8; --crews:#f0883e; --jones:#e25555; --gray:#4fc88a; --hawk:#42c5d4; --koch:#e26fc8;
+    --mono:&#x27;Barlow Condensed&#x27;,sans-serif; --cond:&#x27;Barlow Condensed&#x27;,sans-serif;
+  }
+  [data-theme=&quot;light&quot;]{
+    --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
+    --txt:#10151c; --muted:#52607e; --dim:#8492a3; --accent:#b8860b;
+    --saw:#7d4fc8; --crews:#d2691e; --jones:#c0392b; --gray:#0c9e72; --hawk:#1789a0; --koch:#c0398f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--cond); background:var(--bg); color:var(--txt);
+    -webkit-font-smoothing:antialiased; padding:0 0 60px;
+    font-variant-numeric:tabular-nums;
+  }
+  .main{max-width:1480px;margin:0 auto;padding:0 30px}
+
+  /* HEADER */
+  .ov-header{padding:30px 0 22px;border-bottom:1px solid var(--line);margin-bottom:26px;
+    display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--accent);
+    text-transform:uppercase;font-weight:500}
+  .eyebrow .dot{color:var(--dim);margin:0 7px}
+  h1{font-family:var(--cond);font-weight:900;font-size:32px;line-height:.95;
+    letter-spacing:.4px;text-transform:uppercase;margin-top:6px}
+  h1 em{font-style:normal;color:var(--muted);font-weight:600}
+  .header-stats{display:flex;gap:26px;flex-wrap:wrap}
+  .hstat{text-align:right}
+  .hstat-val{font-family:var(--mono);font-weight:800;font-size:30px;line-height:1;letter-spacing:.5px}
+  .hstat-label{font-family:var(--mono);font-size:9.5px;letter-spacing:1.4px;color:var(--dim);
+    text-transform:uppercase;margin-top:5px}
+
+  /* SECTION TITLES */
+  .sec{margin:34px 0 14px}
+  .sec-title{font-family:var(--cond);font-weight:800;font-size:19px;text-transform:uppercase;
+    letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+  .sec-title::before{content:&quot;&quot;;width:3px;height:17px;background:var(--accent);border-radius:2px;display:inline-block}
+  .sec-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.4px;color:var(--dim);
+    margin-top:4px;margin-left:13px}
+
+  /* TRACK CARDS */
+  .track-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .tcard{background:var(--panel);border:1px solid var(--line2);border-radius:11px;padding:0;
+    overflow:hidden;position:relative;cursor:pointer;transition:.15s;text-decoration:none;color:inherit;display:block}
+  .tcard::before{content:&quot;&quot;;position:absolute;top:0;left:0;right:0;height:3px;background:var(--cc,var(--accent))}
+  .tcard:hover{border-color:var(--cc,var(--accent));transform:translateY(-2px);
+    box-shadow:0 14px 34px rgba(0,0,0,.32)}
+  .tcard-top{padding:18px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .tcard-num{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--dim);font-weight:600}
+  .tcard-name{font-family:var(--cond);font-weight:800;font-size:22px;text-transform:uppercase;
+    letter-spacing:.4px;line-height:1;margin-top:3px}
+  .tcard-dates{font-family:var(--mono);font-size:9.5px;letter-spacing:.6px;color:var(--dim);
+    text-transform:uppercase;margin-top:6px}
+  .tcard-best{text-align:right;flex-shrink:0}
+  .tcard-best-val{font-family:var(--mono);font-weight:800;font-size:27px;line-height:1;color:var(--cc,var(--accent))}
+  .tcard-best-label{font-family:var(--mono);font-size:8.5px;letter-spacing:1.2px;color:var(--dim);
+    text-transform:uppercase;margin-top:4px}
+  .tcard-best-who{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.3px}
+  .tcard-metrics{display:flex;border-top:1px solid var(--line);background:var(--panel2)}
+  .tcard-metric{flex:1;padding:11px 14px;text-align:center;border-right:1px solid var(--line)}
+  .tcard-metric:last-child{border-right:none}
+  .tcard-metric-val{font-family:var(--mono);font-weight:700;font-size:18px;line-height:1}
+  .tcard-metric-label{font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--dim);
+    text-transform:uppercase;margin-top:4px}
+  .tcard-finding{padding:12px 20px 16px;border-top:1px solid var(--line)}
+  .tcard-finding-tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:1px;
+    text-transform:uppercase;font-weight:600;color:var(--cc,var(--accent));
+    border:1px solid var(--cc,var(--accent));border-radius:4px;padding:3px 8px;margin-bottom:7px;opacity:.9}
+  .tcard-finding-sub{font-family:var(--cond);font-size:13px;color:var(--muted);line-height:1.4}
+
+  /* CHART */
+  .chart-card{background:var(--panel);border:1px solid var(--line2);border-radius:11px;
+    padding:20px 22px 18px;margin-top:4px}
+  .chart-wrap{height:340px;position:relative}
+  .chart-note{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.3px;
+    margin-top:12px;line-height:1.6}
+
+  /* PROGRAM FINDINGS LIST */
+  .find-lead{font-family:var(--cond);font-size:15px;line-height:1.6;color:var(--muted);
+    max-width:880px;margin-bottom:18px}
+  .find-lead strong{color:var(--txt)}
+  .find-list{display:flex;flex-direction:column;gap:2px}
+  .find-row{display:flex;align-items:flex-start;gap:14px;padding:13px 4px;
+    border-top:1px solid var(--line)}
+  .find-row:first-child{border-top:none}
+  .find-dot{width:9px;height:9px;border-radius:50%;background:var(--fc,var(--accent));
+    flex-shrink:0;margin-top:7px;box-shadow:0 0 0 3px color-mix(in srgb,var(--fc,var(--accent)) 18%,transparent)}
+  .find-track{font-family:var(--cond);font-weight:800;font-size:16px;text-transform:uppercase;
+    letter-spacing:.4px;color:var(--txt);width:128px;flex-shrink:0;line-height:1.3}
+  .find-track .ftag{display:block;font-family:var(--mono);font-size:9.5px;font-weight:600;
+    letter-spacing:.8px;color:var(--fc,var(--accent));text-transform:uppercase;margin-top:2px}
+  .find-text{font-family:var(--cond);font-size:14.5px;line-height:1.5;color:var(--muted);flex:1}
+
+  @media (max-width:720px){
+    .find-row{flex-wrap:wrap;gap:8px}
+    .find-track{width:auto}
+    .find-text{flex-basis:100%;padding-left:23px}
+  }
+
+  /* DELTA CARDS (sim accuracy per track) */
+  .delta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .dcard{background:var(--panel);border:1px solid var(--line2);border-radius:11px;
+    padding:16px 16px 14px;position:relative;overflow:hidden}
+  .dcard::before{content:&quot;&quot;;position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--vg,var(--accent)),transparent 80%)}
+  .dcard-track{font-family:var(--mono);font-size:9.5px;letter-spacing:1.3px;color:var(--dim);
+    text-transform:uppercase;font-weight:600}
+  .dcard-big{font-family:var(--mono);font-weight:800;font-size:34px;line-height:1;margin-top:8px;
+    letter-spacing:.5px;color:var(--vg,var(--txt));display:flex;align-items:baseline;gap:4px}
+  .dcard-big .u{font-size:15px;font-weight:600;color:var(--dim)}
+  .dcard-big .pct{font-size:14px;font-weight:600;color:var(--dim);margin-left:auto;letter-spacing:.3px}
+  .dcard-tag{font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;
+    margin-top:7px;color:var(--muted);font-weight:600}
+  .dcard-move{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:9px;
+    letter-spacing:.3px;display:flex;align-items:center;gap:6px;line-height:1.4}
+  .dcard-move b{color:var(--muted);font-weight:600}
+  .dcard-arrow{color:var(--vg,var(--accent));font-weight:800}
+
+  @media (max-width:720px){
+    .delta-grid{grid-template-columns:repeat(2,1fr)}
+  }
+
+  /* TIMELINE */
+  .timeline{background:var(--panel);border:1px solid var(--line2);border-radius:11px;padding:24px 26px;position:relative}
+  .tl-track{margin-bottom:20px}
+  .tl-track:last-child{margin-bottom:0}
+  .tl-row{display:flex;align-items:center;gap:14px}
+  .tl-label{width:120px;flex-shrink:0;text-align:right}
+  .tl-label-name{font-family:var(--cond);font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.3px}
+  .tl-label-sess{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.5px;margin-top:2px}
+  .tl-bar-wrap{flex:1;position:relative;height:26px}
+  .tl-bar{position:absolute;height:26px;border-radius:5px;background:var(--cc,var(--accent));
+    opacity:.32;border:1px solid var(--cc,var(--accent))}
+  .tl-bar-fill{position:absolute;height:26px;border-radius:5px;display:flex;align-items:center;
+    padding:0 10px;font-family:var(--mono);font-size:10px;letter-spacing:.5px;color:var(--txt);
+    white-space:nowrap;overflow:hidden}
+  .tl-race{position:absolute;top:-4px;height:34px;width:2px;background:var(--accent);z-index:3}
+  .tl-race::after{content:&quot;🏁&quot;;position:absolute;top:-15px;left:-6px;font-size:11px}
+  .tl-axis{display:flex;justify-content:space-between;margin-top:8px;padding-left:134px}
+  .tl-axis span{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:.5px}
+
+  /* THEME TOGGLE */
+  .theme-btn{position:fixed;bottom:20px;right:20px;z-index:50;
+    background:var(--panel);border:1px solid var(--line2);border-radius:8px;
+    width:42px;height:42px;cursor:pointer;color:var(--muted);font-size:18px;
+    display:flex;align-items:center;justify-content:center;transition:.15s}
+  .theme-btn:hover{color:var(--txt);border-color:var(--accent)}
+
+  @media (max-width:720px){
+    .main{padding:0 16px}
+    h1{font-size:25px}
+    .header-stats{gap:18px}
+    .hstat-val{font-size:23px}
+    .track-grid{grid-template-columns:1fr}
+    .tl-label{width:84px}
+    .tl-label-name{font-size:13px}
+    .tl-axis{padding-left:98px}
+    .chart-wrap{height:300px}
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;main&quot;&gt;
+
+  &lt;!-- HEADER --&gt;
+  &lt;div class=&quot;ov-header&quot;&gt;
+    &lt;div&gt;
+      &lt;div class=&quot;eyebrow&quot;&gt;Toyota Racing Development &lt;span class=&quot;dot&quot;&gt;·&lt;/span&gt; Joe Gibbs Racing&lt;/div&gt;
+      &lt;h1&gt;Program Overview &lt;em&gt;— 2026 Road Course Sim Test&lt;/em&gt;&lt;/h1&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;header-stats&quot;&gt;
+      &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Tracks&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;ov-sessions&quot;&gt;—&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;ov-laps&quot;&gt;—&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Valid Laps&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;hstat&quot;&gt;&lt;div class=&quot;hstat-val&quot; id=&quot;ov-drivers&quot;&gt;—&lt;/div&gt;&lt;div class=&quot;hstat-label&quot;&gt;Drivers&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- TRACK SUMMARY CARDS --&gt;
+  &lt;div class=&quot;sec&quot;&gt;
+    &lt;div class=&quot;sec-title&quot;&gt;By Track&lt;/div&gt;
+    &lt;div class=&quot;sec-sub&quot;&gt;Headline best clean lap, testing volume, and the dominant setup finding for each circuit&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;track-grid&quot; id=&quot;track-grid&quot;&gt;&lt;/div&gt;
+
+  &lt;!-- DRIVER PACE COMPARISON --&gt;
+  &lt;div class=&quot;sec&quot;&gt;
+    &lt;div class=&quot;sec-title&quot;&gt;Sim vs Real-World Target&lt;/div&gt;
+    &lt;div class=&quot;sec-sub&quot;&gt;How close the sim&#x27;s best lap got to the real race fastest lap — before and after each race. Bars are seconds off race pace (0 = on target · below = sim faster · above = sim slower).&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;delta-grid&quot; id=&quot;delta-grid&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;chart-card&quot;&gt;
+    &lt;div class=&quot;chart-wrap&quot;&gt;&lt;canvas id=&quot;targetChart&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;
+    &lt;div class=&quot;chart-note&quot; id=&quot;target-note&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- PROGRAM FINDINGS --&gt;
+  &lt;div class=&quot;sec&quot;&gt;
+    &lt;div class=&quot;sec-title&quot;&gt;Program-Wide Findings&lt;/div&gt;
+    &lt;div class=&quot;sec-sub&quot;&gt;The recurring theme across the 2026 road-course program&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;chart-card&quot; id=&quot;findings-card&quot;&gt;
+    &lt;div id=&quot;findings-body&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- TESTING TIMELINE --&gt;
+  &lt;div class=&quot;sec&quot;&gt;
+    &lt;div class=&quot;sec-title&quot;&gt;Testing Timeline&lt;/div&gt;
+    &lt;div class=&quot;sec-sub&quot;&gt;When each track ran, relative to the program calendar · 🏁 marks race day&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;timeline&quot; id=&quot;timeline&quot;&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;button class=&quot;theme-btn&quot; id=&quot;themeBtn&quot; title=&quot;Toggle theme&quot;&gt;◐&lt;/button&gt;
+
+&lt;script&gt;
+/* ===== DATA (injected) ===== */
+const OV = {&quot;TRACKS&quot;:[{&quot;key&quot;:&quot;cota&quot;,&quot;tab&quot;:&quot;COTA&quot;,&quot;num&quot;:&quot;03&quot;,&quot;best&quot;:97.59,&quot;bestWho&quot;:&quot;Taylor Gray&quot;,&quot;sessions&quot;:24,&quot;valid&quot;:378,&quot;start&quot;:&quot;Jan 7&quot;,&quot;end&quot;:&quot;Mar 3&quot;,&quot;race&quot;:&quot;Feb 28&quot;,&quot;vers&quot;:6,&quot;finding&quot;:&quot;Too Tight&quot;,&quot;findingSub&quot;:&quot;Car tight through the corner — drivers asking for more rotation, even L/R.&quot;,&quot;driverBest&quot;:{&quot;Taylor Gray&quot;:97.59,&quot;Brent Crews&quot;:98.49,&quot;William Sawalich&quot;:99.07,&quot;Brandon Jones&quot;:99.21}},{&quot;key&quot;:&quot;watkins&quot;,&quot;tab&quot;:&quot;Watkins Glen&quot;,&quot;num&quot;:&quot;13&quot;,&quot;best&quot;:71.84,&quot;bestWho&quot;:&quot;Brent Crews&quot;,&quot;sessions&quot;:14,&quot;valid&quot;:421,&quot;start&quot;:&quot;Apr 20&quot;,&quot;end&quot;:&quot;May 12&quot;,&quot;race&quot;:&quot;May 9&quot;,&quot;vers&quot;:3,&quot;finding&quot;:&quot;Rear Grip · Too Free&quot;,&quot;findingSub&quot;:&quot;Lacking lateral rear, particularly through the Carousel, T7 and the Bus Stop.&quot;,&quot;driverBest&quot;:{&quot;Brent Crews&quot;:71.84,&quot;William Sawalich&quot;:72.07,&quot;Taylor Gray&quot;:72.14,&quot;Brandon Jones&quot;:72.39,&quot;Blake Koch&quot;:72.61}},{&quot;key&quot;:&quot;sandiego&quot;,&quot;tab&quot;:&quot;San Diego&quot;,&quot;num&quot;:&quot;18&quot;,&quot;best&quot;:131.13,&quot;bestWho&quot;:&quot;Brent Crews&quot;,&quot;sessions&quot;:34,&quot;valid&quot;:562,&quot;start&quot;:&quot;Apr 22&quot;,&quot;end&quot;:&quot;Jun 22&quot;,&quot;race&quot;:&quot;Jun 20&quot;,&quot;vers&quot;:5,&quot;finding&quot;:&quot;Rear Grip&quot;,&quot;findingSub&quot;:&quot;Rear grip the primary limit across all drivers. Preferred rear gear moved 4.30 → 4.22.&quot;,&quot;driverBest&quot;:{&quot;Brent Crews&quot;:131.13,&quot;William Sawalich&quot;:131.74,&quot;Brandon Jones&quot;:132,&quot;Jack Hawksworth&quot;:132.93,&quot;Blake Koch&quot;:133.14,&quot;Taylor Gray&quot;:134.91}},{&quot;key&quot;:&quot;sonoma&quot;,&quot;tab&quot;:&quot;Sonoma&quot;,&quot;num&quot;:&quot;19&quot;,&quot;best&quot;:75.82,&quot;bestWho&quot;:&quot;Taylor Gray&quot;,&quot;sessions&quot;:17,&quot;valid&quot;:587,&quot;start&quot;:&quot;Jun 2&quot;,&quot;end&quot;:&quot;Jun 29&quot;,&quot;race&quot;:&quot;Jun 27&quot;,&quot;vers&quot;:3,&quot;finding&quot;:&quot;Balance Close · Rear Grip&quot;,&quot;findingSub&quot;:&quot;Balance dialed in close; remaining gains in rear grip and drive off the slow corners.&quot;,&quot;driverBest&quot;:{&quot;Taylor Gray&quot;:75.82,&quot;William Sawalich&quot;:75.91,&quot;Brent Crews&quot;:75.93,&quot;Brandon Jones&quot;:76.79}}],&quot;DRIVERS&quot;:[{&quot;name&quot;:&quot;William Sawalich&quot;,&quot;key&quot;:&quot;saw&quot;,&quot;color&quot;:&quot;#a472e8&quot;},{&quot;name&quot;:&quot;Brent Crews&quot;,&quot;key&quot;:&quot;crews&quot;,&quot;color&quot;:&quot;#f0883e&quot;},{&quot;name&quot;:&quot;Brandon Jones&quot;,&quot;key&quot;:&quot;jones&quot;,&quot;color&quot;:&quot;#e25555&quot;},{&quot;name&quot;:&quot;Taylor Gray&quot;,&quot;key&quot;:&quot;gray&quot;,&quot;color&quot;:&quot;#4fc88a&quot;},{&quot;name&quot;:&quot;Jack Hawksworth&quot;,&quot;key&quot;:&quot;hawk&quot;,&quot;color&quot;:&quot;#42c5d4&quot;},{&quot;name&quot;:&quot;Blake Koch&quot;,&quot;key&quot;:&quot;koch&quot;,&quot;color&quot;:&quot;#e26fc8&quot;}],&quot;totalSessions&quot;:89,&quot;totalValid&quot;:1948,&quot;programStart&quot;:&quot;Jan 7&quot;,&quot;programEnd&quot;:&quot;Jun 29&quot;,&quot;TARGETS&quot;:{&quot;cota&quot;: {&quot;race&quot;: 99.452, &quot;simPre&quot;: 97.59, &quot;simPost&quot;: 100.89}, &quot;watkins&quot;: {&quot;race&quot;: 71.934, &quot;simPre&quot;: 71.84, &quot;simPost&quot;: 72.12}, &quot;sandiego&quot;: {&quot;race&quot;: 136.034, &quot;simPre&quot;: 131.13, &quot;simPost&quot;: 134.91}, &quot;sonoma&quot;: {&quot;race&quot;: 76.564, &quot;simPre&quot;: 75.82, &quot;simPost&quot;: 76.6}}};
+const TAB_PREFIX = {cota:&#x27;cota&#x27;, watkins:&#x27;watkins&#x27;, sandiego:&#x27;sandiego&#x27;, sonoma:&#x27;sonoma&#x27;};
+const TRACK_COLORS = {cota:&#x27;--accent&#x27;, watkins:&#x27;--hawk&#x27;, sandiego:&#x27;--jones&#x27;, sonoma:&#x27;--gray&#x27;};
+
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+/* tell the shell to switch tabs when a track card is clicked */
+function gotoTrack(key){
+  try{ parent.postMessage({type:&#x27;gototab&#x27;, tab:key}, &#x27;*&#x27;); }catch(e){}
+}
+
+/* ===== HEADER STATS ===== */
+document.getElementById(&#x27;ov-sessions&#x27;).textContent = OV.totalSessions;
+document.getElementById(&#x27;ov-laps&#x27;).textContent = OV.totalValid.toLocaleString();
+document.getElementById(&#x27;ov-drivers&#x27;).textContent = OV.DRIVERS.length;
+
+/* ===== TRACK CARDS ===== */
+const grid=document.getElementById(&#x27;track-grid&#x27;);
+grid.innerHTML = OV.TRACKS.map(t=&gt;{
+  const cc=&#x27;var(&#x27;+TRACK_COLORS[t.key]+&#x27;)&#x27;;
+  return `&lt;a class=&quot;tcard&quot; style=&quot;--cc:${cc}&quot; onclick=&quot;gotoTrack(&#x27;${t.key}&#x27;)&quot;&gt;
+    &lt;div class=&quot;tcard-top&quot;&gt;
+      &lt;div&gt;
+        &lt;div class=&quot;tcard-num&quot;&gt;TRACK ${t.num}&lt;/div&gt;
+        &lt;div class=&quot;tcard-name&quot;&gt;${t.tab}&lt;/div&gt;
+        &lt;div class=&quot;tcard-dates&quot;&gt;${t.start} – ${t.end}&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;tcard-best&quot;&gt;
+        &lt;div class=&quot;tcard-best-val&quot;&gt;${t.best.toFixed(2)}&lt;/div&gt;
+        &lt;div class=&quot;tcard-best-label&quot;&gt;Best Clean&lt;/div&gt;
+        &lt;div class=&quot;tcard-best-who&quot;&gt;${t.bestWho}&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;tcard-metrics&quot;&gt;
+      &lt;div class=&quot;tcard-metric&quot;&gt;&lt;div class=&quot;tcard-metric-val&quot;&gt;${t.sessions}&lt;/div&gt;&lt;div class=&quot;tcard-metric-label&quot;&gt;Sessions&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;tcard-metric&quot;&gt;&lt;div class=&quot;tcard-metric-val&quot;&gt;${t.valid}&lt;/div&gt;&lt;div class=&quot;tcard-metric-label&quot;&gt;Valid Laps&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;tcard-metric&quot;&gt;&lt;div class=&quot;tcard-metric-val&quot;&gt;${t.vers}&lt;/div&gt;&lt;div class=&quot;tcard-metric-label&quot;&gt;Versions&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;tcard-finding&quot;&gt;
+      &lt;span class=&quot;tcard-finding-tag&quot;&gt;${t.finding}&lt;/span&gt;
+      &lt;div class=&quot;tcard-finding-sub&quot;&gt;${t.findingSub}&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/a&gt;`;
+}).join(&#x27;&#x27;);
+
+/* ===== SIM vs TARGET: DELTA CARDS ===== */
+function hexA(hex,a){ // hex + alpha -&gt; rgba
+  const h=hex.replace(&#x27;#&#x27;,&#x27;&#x27;);
+  const n=h.length===3?h.split(&#x27;&#x27;).map(c=&gt;c+c).join(&#x27;&#x27;):h;
+  const r=parseInt(n.slice(0,2),16),g=parseInt(n.slice(2,4),16),b=parseInt(n.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function fmtDelta(v){ return (v&gt;0?&#x27;+&#x27;:v&lt;0?&#x27;\u2212&#x27;:&#x27;&#x27;)+Math.abs(v).toFixed(2); }
+function renderDeltaCards(){
+  const grid=document.getElementById(&#x27;delta-grid&#x27;);
+  const T=OV.TARGETS;
+  const cGood=cssVar(&#x27;--gray&#x27;), cBad=cssVar(&#x27;--jones&#x27;), cOn=cssVar(&#x27;--accent&#x27;);
+  grid.innerHTML=OV.TRACKS.map(t=&gt;{
+    const k=t.key, d=T[k];
+    const post=+(d.simPost-d.race).toFixed(2);
+    const pre =+(d.simPre -d.race).toFixed(2);
+    // headline = pre-race gap to actual race pace; color/tag reflect that state
+    const col = Math.abs(pre)&lt;=0.25 ? cOn : (pre&lt;0 ? cGood : cBad);
+    const tag = Math.abs(pre)&lt;=0.25 ? &#x27;On Target&#x27; : (pre&lt;0 ? &#x27;Sim Faster&#x27; : &#x27;Sim Slower&#x27;);
+    const pct = +(pre / d.race * 100).toFixed(2);
+    const pctStr = (pct&gt;0?&#x27;+&#x27;:pct&lt;0?&#x27;\u2212&#x27;:&#x27;&#x27;)+Math.abs(pct).toFixed(2)+&#x27;%&#x27;;
+    const improved = Math.abs(post)&lt;Math.abs(pre);
+    const arrow = improved ? &#x27;\u2198&#x27; : &#x27;\u2197&#x27;;
+    return `&lt;div class=&quot;dcard&quot; style=&quot;--vg:${col}&quot;&gt;
+      &lt;div class=&quot;dcard-track&quot;&gt;${t.tab}&lt;/div&gt;
+      &lt;div class=&quot;dcard-big&quot;&gt;${fmtDelta(pre)}&lt;span class=&quot;u&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;pct&quot;&gt;${pctStr}&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;dcard-tag&quot;&gt;${tag} · pre-race&lt;/div&gt;
+      &lt;div class=&quot;dcard-move&quot;&gt;
+        &lt;b&gt;${fmtDelta(pre)}&lt;/b&gt;&lt;span class=&quot;dcard-arrow&quot;&gt;${arrow}&lt;/span&gt;&lt;b&gt;${fmtDelta(post)}&lt;/b&gt;
+        &lt;span&gt;pre \u2192 post&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;`;
+  }).join(&#x27;&#x27;);
+}
+
+/* ===== SIM vs TARGET CHART ===== */
+function buildTargetChart(){
+  const ctx=document.getElementById(&#x27;targetChart&#x27;);
+  const keys=OV.TRACKS.map(t=&gt;t.key);
+  const labels=OV.TRACKS.map(t=&gt;t.tab);
+  const T=OV.TARGETS;
+  const preDelta =keys.map(k=&gt;T[k].simPre!=null ? +(T[k].simPre - T[k].race).toFixed(2) : null);
+  const postDelta=keys.map(k=&gt;T[k].simPost!=null? +(T[k].simPost- T[k].race).toFixed(2) : null);
+
+  const cPre=cssVar(&#x27;--hawk&#x27;), cPost=cssVar(&#x27;--accent&#x27;), cRace=cssVar(&#x27;--jones&#x27;);
+  const tick=cssVar(&#x27;--dim&#x27;), grid=cssVar(&#x27;--line&#x27;);
+
+  // vertical gradient fills for the bars
+  function grad(base){
+    const g=ctx.getContext(&#x27;2d&#x27;).createLinearGradient(0,0,0,ctx.height||340);
+    g.addColorStop(0, hexA(base,.95));
+    g.addColorStop(1, hexA(base,.45));
+    return g;
+  }
+
+  // on-bar value labels
+  const valueLabels={
+    id:&#x27;valueLabels&#x27;,
+    afterDatasetsDraw(chart){
+      const {ctx}=chart;
+      chart.data.datasets.forEach((ds,di)=&gt;{
+        const meta=chart.getDatasetMeta(di);
+        meta.data.forEach((bar,i)=&gt;{
+          const v=ds.data[i];
+          if(v===null||v===undefined) return;
+          const txt=(v&gt;0?&#x27;+&#x27;:v&lt;0?&#x27;\u2212&#x27;:&#x27;&#x27;)+Math.abs(v).toFixed(2);
+          ctx.save();
+          ctx.font=&#x27;700 12px Barlow Condensed&#x27;;
+          ctx.fillStyle=cssVar(&#x27;--txt&#x27;);
+          ctx.textAlign=&#x27;center&#x27;;
+          const above=v&gt;=0;
+          ctx.textBaseline=above?&#x27;bottom&#x27;:&#x27;top&#x27;;
+          const pad=above?-5:5;
+          ctx.fillText(txt, bar.x, bar.y+pad);
+          ctx.restore();
+        });
+      });
+    }
+  };
+
+  return new Chart(ctx,{
+    type:&#x27;bar&#x27;,
+    data:{labels,datasets:[
+      {label:&#x27;Sim — Pre-Race Best&#x27;, data:preDelta, backgroundColor:grad(cPre), borderColor:hexA(cPre,1),
+        borderWidth:0, borderRadius:4, barPercentage:.78, categoryPercentage:.6},
+      {label:&#x27;Sim — Post-Race Best&#x27;, data:postDelta, backgroundColor:grad(cPost), borderColor:hexA(cPost,1),
+        borderWidth:0, borderRadius:4, barPercentage:.78, categoryPercentage:.6}
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:14}},
+      scales:{
+        y:{grid:{color:c=&gt;c.tick.value===0?cssVar(&#x27;--muted&#x27;):grid,
+              lineWidth:c=&gt;c.tick.value===0?1.5:1},
+           ticks:{color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:11},
+             callback:v=&gt;v===0?&#x27;TARGET&#x27;:(v&gt;0?&#x27;+&#x27;:&#x27;&#x27;)+v.toFixed(1)},
+           title:{display:true,text:&#x27;Seconds off Race Fastest Lap&#x27;,color:tick,font:{family:&#x27;Barlow Condensed&#x27;,size:10}}},
+        x:{grid:{display:false}, ticks:{color:cssVar(&#x27;--muted&#x27;),font:{family:&#x27;Barlow Condensed&#x27;,size:13,weight:&#x27;700&#x27;}}}
+      },
+      plugins:{
+        legend:{position:&#x27;top&#x27;,align:&#x27;end&#x27;,labels:{color:cssVar(&#x27;--muted&#x27;),font:{family:&#x27;Barlow Condensed&#x27;,size:12},
+          boxWidth:12,boxHeight:12,padding:16}},
+        tooltip:{
+          backgroundColor:cssVar(&#x27;--panel2&#x27;),borderColor:cssVar(&#x27;--line2&#x27;),borderWidth:1,
+          titleColor:cssVar(&#x27;--txt&#x27;),bodyColor:cssVar(&#x27;--muted&#x27;),padding:11,
+          titleFont:{family:&#x27;Barlow Condensed&#x27;,size:13,weight:&#x27;700&#x27;},
+          bodyFont:{family:&#x27;Barlow Condensed&#x27;,size:12},
+          callbacks:{
+            title:(items)=&gt;{ const k=keys[items[0].dataIndex]; return labels[items[0].dataIndex]+&#x27;  ·  Race Fastest &#x27;+OV.TARGETS[k].race.toFixed(2)+&#x27;s&#x27;; },
+            label:(c)=&gt;{
+              const k=keys[c.dataIndex], v=c.raw;
+              if(v===null) return null;
+              const isPre=c.datasetIndex===0;
+              const simLap=isPre?OV.TARGETS[k].simPre:OV.TARGETS[k].simPost;
+              const sign=v&gt;0?&#x27;+&#x27;:&#x27;&#x27;;
+              const word=v&lt;0?&#x27;faster than&#x27;:v&gt;0?&#x27;slower than&#x27;:&#x27;on&#x27;;
+              return ` ${c.dataset.label}: ${simLap.toFixed(2)}s  (${sign}${v.toFixed(2)}s ${word} race)`;
+            },
+            afterBody:()=&gt;null
+          }
+        }
+      }
+    },
+    plugins:[valueLabels]
+  });
+}
+renderDeltaCards();
+let targetChart=buildTargetChart();
+document.getElementById(&#x27;target-note&#x27;).textContent =
+  &#x27;Target is the fastest real-world race lap (the 0 line). Cards show the pre-race gap to that pace, with the pre \u2192 post movement over race weekend. Sim values are the best clean lap before vs. after race day; San Diego\u2019s post-race figure is the grip-corrected Jun 22 session.&#x27;;
+
+
+/* ===== FINDINGS ===== */
+document.getElementById(&#x27;findings-body&#x27;).innerHTML = `
+  &lt;div class=&quot;find-lead&quot;&gt;
+    &lt;strong&gt;Rear grip is the through-line of the 2026 road-course program.&lt;/strong&gt;
+    Three of the four circuits converged on rear grip as the primary limit; COTA was the lone exception, asking for the opposite.
+  &lt;/div&gt;
+  &lt;div class=&quot;find-list&quot;&gt;
+    ${OV.TRACKS.map(t=&gt;{
+      const cc=&#x27;var(&#x27;+TRACK_COLORS[t.key]+&#x27;)&#x27;;
+      return `&lt;div class=&quot;find-row&quot; style=&quot;--fc:${cc}&quot;&gt;
+        &lt;span class=&quot;find-dot&quot;&gt;&lt;/span&gt;
+        &lt;div class=&quot;find-track&quot;&gt;${t.tab}&lt;span class=&quot;ftag&quot;&gt;${t.finding}&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;find-text&quot;&gt;${t.findingSub}&lt;/div&gt;
+      &lt;/div&gt;`;
+    }).join(&#x27;&#x27;)}
+  &lt;/div&gt;`;
+
+/* ===== TESTING TIMELINE ===== */
+(function(){
+  // map a &quot;Mon D&quot; date to a day-of-year-ish index for positioning
+  const MON={Jan:0,Feb:31,Mar:59,Apr:90,May:120,Jun:151,Jul:181};
+  function doy(s){ const [m,d]=s.split(&#x27; &#x27;); return MON[m]+parseInt(d,10); }
+  const allStart=Math.min(...OV.TRACKS.map(t=&gt;doy(t.start)));
+  const allEnd=Math.max(...OV.TRACKS.map(t=&gt;doy(t.end)));
+  const span=allEnd-allStart || 1;
+  const pct=v=&gt;((doy(v)-allStart)/span*100);
+
+  const tl=document.getElementById(&#x27;timeline&#x27;);
+  tl.innerHTML = OV.TRACKS.map(t=&gt;{
+    const cc=&#x27;var(&#x27;+TRACK_COLORS[t.key]+&#x27;)&#x27;;
+    const x0=pct(t.start), x1=pct(t.end), w=Math.max(x1-x0,2.5);
+    const racePct=pct(t.race);
+    const raceInside=(doy(t.race)&gt;=allStart &amp;&amp; doy(t.race)&lt;=allEnd);
+    return `&lt;div class=&quot;tl-track&quot;&gt;
+      &lt;div class=&quot;tl-row&quot;&gt;
+        &lt;div class=&quot;tl-label&quot;&gt;
+          &lt;div class=&quot;tl-label-name&quot;&gt;${t.tab}&lt;/div&gt;
+          &lt;div class=&quot;tl-label-sess&quot;&gt;${t.sessions} sessions&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;tl-bar-wrap&quot;&gt;
+          &lt;div class=&quot;tl-bar&quot; style=&quot;--cc:${cc};left:${x0}%;width:${w}%&quot;&gt;&lt;/div&gt;
+          &lt;div class=&quot;tl-bar-fill&quot; style=&quot;left:${x0}%;width:${w}%;color:${cc}&quot;&gt;${t.start} – ${t.end}&lt;/div&gt;
+          ${raceInside?`&lt;div class=&quot;tl-race&quot; style=&quot;left:${racePct}%&quot;&gt;&lt;/div&gt;`:&#x27;&#x27;}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;`;
+  }).join(&#x27;&#x27;) + `
+    &lt;div class=&quot;tl-axis&quot;&gt;
+      &lt;span&gt;${OV.programStart}&lt;/span&gt;
+      &lt;span&gt;Mar&lt;/span&gt;&lt;span&gt;Apr&lt;/span&gt;&lt;span&gt;May&lt;/span&gt;
+      &lt;span&gt;${OV.programEnd}&lt;/span&gt;
+    &lt;/div&gt;`;
+})();
+
+/* ===== THEME TOGGLE ===== */
+const themeBtn=document.getElementById(&#x27;themeBtn&#x27;);
+function applyTheme(t){
+  if(t===&#x27;light&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,&#x27;light&#x27;);
+  else document.documentElement.removeAttribute(&#x27;data-theme&#x27;);
+  // rebuild chart for new colors
+  if(targetChart){ targetChart.destroy(); targetChart=buildTargetChart(); }
+  renderDeltaCards();
+}
+themeBtn.addEventListener(&#x27;click&#x27;,()=&gt;{
+  const isLight=document.documentElement.getAttribute(&#x27;data-theme&#x27;)===&#x27;light&#x27;;
+  applyTheme(isLight?&#x27;dark&#x27;:&#x27;light&#x27;);
+});
+/* inherit theme from parent shell if it broadcasts one */
+window.addEventListener(&#x27;message&#x27;,e=&gt;{ if(e.data&amp;&amp;e.data.type===&#x27;theme&#x27;){ applyTheme(e.data.value); } });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" title="Program Overview" loading="lazy"></iframe></div>
+<div class="track-panel" id="panel-cota" role="tabpanel" data-tab="cota"><iframe class="track-frame" data-srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
 &lt;script&gt;try{sessionStorage.setItem(&#x27;cota_auth&#x27;,&#x27;1&#x27;);}catch(e){}&lt;/script&gt;
@@ -1238,6 +1722,11 @@ function startApp(){
   const input=document.getElementById(&#x27;lockinput&#x27;);
   const btn=document.getElementById(&#x27;lockbtn&#x27;);
   const err=document.getElementById(&#x27;lockerr&#x27;);
+
+  window.addEventListener('message',function(ev){
+    if(ev.data && ev.data.type==='gototab' && ev.data.tab){ try{ activate(ev.data.tab); }catch(e){} }
+  });
+
   function reveal(){ gate.style.display=&#x27;none&#x27;; app.classList.remove(&#x27;app-hidden&#x27;); startApp(); }
   try{ if(sessionStorage.getItem(&#x27;cota_auth&#x27;)===&#x27;1&#x27;){ reveal(); return; } }catch(e){}
   function attempt(){
