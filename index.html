@@ -10,10 +10,15 @@
 <style>
   :root{
     --bg:#06080d; --panel:#0e131c; --panel2:#141a26; --line:#212a38; --line2:#2d3a4c;
-    --txt:#eef1f6; --muted:#94a1b2; --dim:#5d6b7d;
+    --txt:#eef1f6; --muted:#b8c2d0; --dim:#95a2b4;
     --accent:#e6b84f;
     --mono:'Barlow Condensed',sans-serif;
     --cond:'Barlow Condensed',sans-serif;
+  }
+  [data-theme="light"]{
+    --bg:#e9edf3; --panel:#ffffff; --panel2:#f4f6fa; --line:#dde3ec; --line2:#c4cedb;
+    --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+    --accent:#8a6207;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -25,6 +30,22 @@
       radial-gradient(900px 520px at -5% 108%,rgba(66,150,212,.045),transparent 60%);
     background-attachment:fixed;
   }
+  [data-theme="light"] body{
+    background-image:
+      radial-gradient(1100px 500px at 90% -12%,rgba(184,134,11,.06),transparent 62%),
+      radial-gradient(900px 520px at -5% 108%,rgba(23,137,160,.05),transparent 60%);
+  }
+
+  /* ===== THEME TOGGLE ===== */
+  .theme-toggle{
+    display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+    background:var(--panel2); border:1px solid var(--line2); border-radius:7px;
+    color:var(--muted); font-family:var(--mono); font-size:11px; font-weight:600;
+    letter-spacing:.5px; text-transform:uppercase; padding:6px 11px; margin-top:9px;
+    transition:.15s;
+  }
+  .theme-toggle:hover{ color:var(--txt); border-color:var(--accent); }
+  .theme-toggle .tt-icon{ font-size:13px; line-height:1; }
 
   /* ===== TOP BAR ===== */
   .topbar{
@@ -32,6 +53,9 @@
     background:linear-gradient(180deg,rgba(14,19,28,.97),rgba(14,19,28,.88));
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line2);
+  }
+  [data-theme="light"] .topbar{
+    background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(255,255,255,.9));
   }
   .topbar::after{
     content:""; position:absolute; left:0; right:0; bottom:0; height:2px;
@@ -170,7 +194,10 @@
       </div>
       <div class="brand-right">
         <b>4 Tracks</b> · Simulator Program<br>
-        COTA · Watkins Glen · San Diego · Sonoma
+        COTA · Watkins Glen · San Diego · Sonoma<br>
+        <button id="themeToggle" class="theme-toggle" title="Toggle light / dark" aria-label="Toggle light or dark mode">
+          <span class="tt-icon">☾</span><span class="tt-label">Dark</span>
+        </button>
       </div>
     </div>
     <div class="track-tabs" role="tablist" aria-label="Track selection">
@@ -197,15 +224,15 @@
 &lt;style&gt;
   :root{
     --bg:#0a0d12; --panel:#11151c; --panel2:#161b24; --line:#222a35; --line2:#2d3744;
-    --txt:#eef1f6; --muted:#94a1b2; --dim:#5d6b7d;
+    --txt:#eef1f6; --muted:#b8c2d0; --dim:#95a2b4;
     --accent:#e6b84f;
     --saw:#a472e8; --crews:#f0883e; --jones:#e25555; --gray:#4fc88a; --hawk:#42c5d4; --koch:#e26fc8;
     --mono:&#x27;Barlow Condensed&#x27;,sans-serif; --cond:&#x27;Barlow Condensed&#x27;,sans-serif;
   }
   [data-theme=&quot;light&quot;]{
     --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
-    --txt:#10151c; --muted:#52607e; --dim:#8492a3; --accent:#b8860b;
-    --saw:#7d4fc8; --crews:#d2691e; --jones:#c0392b; --gray:#0c9e72; --hawk:#1789a0; --koch:#c0398f;
+    --txt:#10151c; --muted:#4a5872; --dim:#63707f; --accent:#8a6207;
+    --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
@@ -235,8 +262,8 @@
   .sec-title{font-family:var(--cond);font-weight:800;font-size:19px;text-transform:uppercase;
     letter-spacing:.5px;display:flex;align-items:center;gap:10px}
   .sec-title::before{content:&quot;&quot;;width:3px;height:17px;background:var(--accent);border-radius:2px;display:inline-block}
-  .sec-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.4px;color:var(--dim);
-    margin-top:4px;margin-left:13px}
+  .sec-sub{font-family:var(--mono);font-size:11px;letter-spacing:.4px;color:var(--muted);
+    margin-top:5px;margin-left:13px;line-height:1.5}
 
   /* TRACK CARDS */
   .track-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
@@ -275,27 +302,37 @@
   .chart-note{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.3px;
     margin-top:12px;line-height:1.6}
 
-  /* PROGRAM FINDINGS LIST */
+  /* PROGRAM FINDINGS — per-track cards (setup finding + sim-vs-race debrief) */
   .find-lead{font-family:var(--cond);font-size:15px;line-height:1.6;color:var(--muted);
     max-width:880px;margin-bottom:18px}
   .find-lead strong{color:var(--txt)}
-  .find-list{display:flex;flex-direction:column;gap:2px}
-  .find-row{display:flex;align-items:flex-start;gap:14px;padding:13px 4px;
-    border-top:1px solid var(--line)}
-  .find-row:first-child{border-top:none}
-  .find-dot{width:9px;height:9px;border-radius:50%;background:var(--fc,var(--accent));
-    flex-shrink:0;margin-top:7px;box-shadow:0 0 0 3px color-mix(in srgb,var(--fc,var(--accent)) 18%,transparent)}
-  .find-track{font-family:var(--cond);font-weight:800;font-size:16px;text-transform:uppercase;
-    letter-spacing:.4px;color:var(--txt);width:128px;flex-shrink:0;line-height:1.3}
-  .find-track .ftag{display:block;font-family:var(--mono);font-size:9.5px;font-weight:600;
-    letter-spacing:.8px;color:var(--fc,var(--accent));text-transform:uppercase;margin-top:2px}
-  .find-text{font-family:var(--cond);font-size:14.5px;line-height:1.5;color:var(--muted);flex:1}
-
-  @media (max-width:720px){
-    .find-row{flex-wrap:wrap;gap:8px}
-    .find-track{width:auto}
-    .find-text{flex-basis:100%;padding-left:23px}
-  }
+  .fcard{background:var(--panel);border:1px solid var(--line2);border-radius:11px;
+    padding:0;margin-bottom:14px;overflow:hidden;position:relative}
+  .fcard::before{content:&quot;&quot;;position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--fc,var(--accent))}
+  .fcard-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:16px 20px 12px}
+  .fcard-name{font-family:var(--cond);font-weight:800;font-size:19px;text-transform:uppercase;
+    letter-spacing:.4px;color:var(--txt)}
+  .fcard-tag{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+    color:var(--fc,var(--accent));border:1px solid var(--fc,var(--accent));border-radius:4px;padding:3px 8px;opacity:.9}
+  .fcard-race{font-family:var(--mono);font-size:10px;letter-spacing:.4px;color:var(--dim);margin-left:auto}
+  .fcard-sub{font-family:var(--cond);font-size:14px;line-height:1.45;color:var(--muted);
+    padding:0 20px 14px;max-width:900px}
+  .svr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 20px 18px}
+  .svr-col{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:13px 15px;
+    position:relative;overflow:hidden}
+  .svr-col::before{content:&quot;&quot;;position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc)}
+  .svr-badge{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    color:var(--sc);display:block;margin-bottom:10px}
+  .svr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .svr-list li{font-family:var(--cond);font-size:13.5px;line-height:1.5;color:var(--muted);
+    padding-left:14px;position:relative}
+  .svr-list li::before{content:&quot;&quot;;position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;
+    background:var(--sc);opacity:.7}
+  .svr-list li .car{font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:.3px;opacity:.85}
+  .svr-pending{padding:0 20px 18px}
+  .svr-pending-box{background:var(--panel2);border:1px dashed var(--line2);border-radius:9px;
+    padding:14px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.4px;color:var(--dim)}
+  @media (max-width:720px){ .svr-grid{grid-template-columns:1fr} .fcard-race{margin-left:0;flex-basis:100%} }
 
   /* DELTA CARDS (sim accuracy per track) */
   .delta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
@@ -394,14 +431,12 @@
     &lt;div class=&quot;chart-note&quot; id=&quot;target-note&quot;&gt;&lt;/div&gt;
   &lt;/div&gt;
 
-  &lt;!-- PROGRAM FINDINGS --&gt;
+  &lt;!-- PROGRAM FINDINGS (setup finding + sim-vs-race debrief per track) --&gt;
   &lt;div class=&quot;sec&quot;&gt;
     &lt;div class=&quot;sec-title&quot;&gt;Program-Wide Findings&lt;/div&gt;
-    &lt;div class=&quot;sec-sub&quot;&gt;The recurring theme across the 2026 road-course program&lt;/div&gt;
+    &lt;div class=&quot;sec-sub&quot;&gt;Per-track setup finding and the sim-vs-race debrief — what the sim prepared us for versus what the drivers actually fought&lt;/div&gt;
   &lt;/div&gt;
-  &lt;div class=&quot;chart-card&quot; id=&quot;findings-card&quot;&gt;
-    &lt;div id=&quot;findings-body&quot;&gt;&lt;/div&gt;
-  &lt;/div&gt;
+  &lt;div id=&quot;findings-body&quot;&gt;&lt;/div&gt;
 
   &lt;!-- TESTING TIMELINE --&gt;
   &lt;div class=&quot;sec&quot;&gt;
@@ -412,7 +447,7 @@
 
 &lt;/div&gt;
 
-&lt;button class=&quot;theme-btn&quot; id=&quot;themeBtn&quot; title=&quot;Toggle theme&quot;&gt;◐&lt;/button&gt;
+
 
 &lt;script&gt;
 /* ===== DATA (injected) ===== */
@@ -592,23 +627,103 @@ let targetChart=buildTargetChart();
 document.getElementById(&#x27;target-note&#x27;).textContent =
   &#x27;Target is the fastest real-world race lap (the 0 line). Cards show the pre-race gap to that pace, with the pre \u2192 post movement over race weekend. Sim values are the best clean lap before vs. after race day; San Diego\u2019s post-race figure is the grip-corrected Jun 22 session.&#x27;;
 
+/* ===== PROGRAM FINDINGS: setup finding + sim-vs-race debrief per track ===== */
+(function(){
+  const cSeg=cssVar(&#x27;--dim&#x27;);
+  // sim-vs-race debrief, keyed by track (only where post-race notes exist)
+  const DEBRIEF={
+    cota:{ race:&#x27;Feb 28 · cars 18 · 19 · 20 · 54&#x27;,
+      matched:[
+        {t:&#x27;Brake feel was realistic — carried over from sim to track.&#x27;, car:&#x27;19&#x27;},
+        {t:&#x27;GT12 posted close to at-track feel; GTX ran sideways-loose pre-event.&#x27;, car:&#x27;20&#x27;}
+      ],
+      misled:[
+        {t:&#x27;Over-gripped laterally — ~3% too much grip, flattering pace everywhere.&#x27;, car:&#x27;18 · 19&#x27;},
+        {t:&#x27;Too much front grip; braking zones all backed up vs. the real track.&#x27;, car:&#x27;18&#x27;},
+        {t:&#x27;\u201CMatched last year, not this year\u201D — real track had far less grip than expected.&#x27;, car:&#x27;18 · 19&#x27;}
+      ],
+      missed:[
+        {t:&#x27;Wheel hop under braking (T1 / T12 / T20) barely showed in sim, major in the race.&#x27;, car:&#x27;18 · 20 · 54&#x27;},
+        {t:&#x27;Platform roll in high-speed corners under-weighted — fought hard in the race.&#x27;, car:&#x27;19 · 54&#x27;}
+      ]},
+    watkins:{ race:&#x27;May 9 · cars 18 · 19 · 20 · 54&#x27;,
+      matched:[
+        {t:&#x27;Best sim correlation of the program — all four drivers rated pre-race sim good/close.&#x27;, car:&#x27;18 · 19 · 20 · 54&#x27;},
+        {t:&#x27;Off-the-truck grip was close; sim and track converged as the track rubbered in.&#x27;, car:&#x27;19&#x27;}
+      ],
+      misled:[
+        {t:&#x27;Braking zones showed more potential in the sim than in reality.&#x27;, car:&#x27;54&#x27;},
+        {t:&#x27;Sim tightened too much on top of T3 — real life is neutral-to-loose there.&#x27;, car:&#x27;20&#x27;},
+        {t:&#x27;Real track tightened ~1\u20131.5# as it took rubber — not captured pre-race.&#x27;, car:&#x27;19 · 20 · 54&#x27;}
+      ],
+      missed:[
+        {t:&#x27;GTX brakes flagged as poor and post-race tire loose — to retry on GT12.&#x27;, car:&#x27;19&#x27;},
+        {t:&#x27;Down on motor / low power all weekend — outside the sim\u2019s scope.&#x27;, car:&#x27;19&#x27;}
+      ]},
+    sandiego:{ race:&#x27;Jun 20 · cars 18 · 19 · 54&#x27;,
+      matched:[
+        {t:&#x27;Brakes, front turn and gearing were strengths — carried from sim to track.&#x27;, car:&#x27;18 · 19 · 54&#x27;},
+        {t:&#x27;Track-model fix (tire packs / walls at 12/12b) translated well to the race.&#x27;, car:&#x27;54&#x27;}
+      ],
+      misled:[
+        {t:&#x27;Sim was too fast / too much grip — the gap that drove the mid-program grip correction.&#x27;, car:&#x27;18 · 19 · 54&#x27;},
+        {t:&#x27;Real concrete was worse and the surface rougher than the sim portrayed.&#x27;, car:&#x27;19&#x27;},
+        {t:&#x27;GTX vs GT12 engine mapping felt different in accel/decel.&#x27;, car:&#x27;18&#x27;}
+      ],
+      missed:[
+        {t:&#x27;Wheel hop under braking (T3 / T8 / T9) tied to losing rear grip late in runs.&#x27;, car:&#x27;18 · 54&#x27;},
+        {t:&#x27;Caster shake — steering wheel shaking badly into T8, not flagged from sim.&#x27;, car:&#x27;54&#x27;}
+      ]},
+    sonoma:{ race:&#x27;Jun 27 · cars 18 · 19 · 20 · 54&#x27;,
+      matched:[
+        {t:&#x27;Balance was solid all weekend — setup dialed in close, as testing suggested.&#x27;, car:&#x27;54&#x27;},
+        {t:&#x27;Posted tire was close; braking zones and drive-off were genuine strengths.&#x27;, car:&#x27;20 · 54&#x27;}
+      ],
+      misled:[
+        {t:&#x27;Over-gripped — \u201Ctoo easy to get through T10\u201D in sim vs. the real corner.&#x27;, car:&#x27;18 · 54&#x27;},
+        {t:&#x27;Not enough turn and more rear grip pre-event than the race showed.&#x27;, car:&#x27;20&#x27;},
+        {t:&#x27;Hard to feel setup changes in the sim (drivers preferred GT12).&#x27;, car:&#x27;18&#x27;}
+      ],
+      missed:[
+        {t:&#x27;Platform roll under-represented — car went \u201Cfloppy\u201D in the race, loose when a tire unloaded.&#x27;, car:&#x27;19&#x27;},
+        {t:&#x27;Wheel hop bad enough to clutch it and break a rear gear — barely present in practice.&#x27;, car:&#x27;20&#x27;},
+        {t:&#x27;GTX brakes needed more force; GT12 brake feel closer to real life.&#x27;, car:&#x27;54&#x27;}
+      ]}
+  };
 
-/* ===== FINDINGS ===== */
-document.getElementById(&#x27;findings-body&#x27;).innerHTML = `
-  &lt;div class=&quot;find-lead&quot;&gt;
-    &lt;strong&gt;Rear grip is the through-line of the 2026 road-course program.&lt;/strong&gt;
-    Three of the four circuits converged on rear grip as the primary limit; COTA was the lone exception, asking for the opposite.
-  &lt;/div&gt;
-  &lt;div class=&quot;find-list&quot;&gt;
+  const SEGS=[[&#x27;matched&#x27;,&#x27;Sim Matched&#x27;,cSeg],[&#x27;misled&#x27;,&#x27;Sim Misled&#x27;,cSeg],[&#x27;missed&#x27;,&#x27;Sim Missed&#x27;,cSeg]];
+
+  const html = `
+    &lt;div class=&quot;find-lead&quot;&gt;
+      &lt;strong&gt;Rear grip is the through-line of the 2026 road-course program&lt;/strong&gt;, with COTA the lone exception (too tight). Alongside the setup story, the driver debriefs show how well the sim predicted each race — strong at Watkins Glen, over-gripped and optimistic at COTA.
+    &lt;/div&gt;
     ${OV.TRACKS.map(t=&gt;{
       const cc=&#x27;var(&#x27;+TRACK_COLORS[t.key]+&#x27;)&#x27;;
-      return `&lt;div class=&quot;find-row&quot; style=&quot;--fc:${cc}&quot;&gt;
-        &lt;span class=&quot;find-dot&quot;&gt;&lt;/span&gt;
-        &lt;div class=&quot;find-track&quot;&gt;${t.tab}&lt;span class=&quot;ftag&quot;&gt;${t.finding}&lt;/span&gt;&lt;/div&gt;
-        &lt;div class=&quot;find-text&quot;&gt;${t.findingSub}&lt;/div&gt;
+      const db=DEBRIEF[t.key];
+      const body = db ? `
+        &lt;div class=&quot;svr-grid&quot;&gt;
+          ${SEGS.map(([key,badge,sc])=&gt;`
+            &lt;div class=&quot;svr-col&quot; style=&quot;--sc:${sc}&quot;&gt;
+              &lt;span class=&quot;svr-badge&quot;&gt;${badge}&lt;/span&gt;
+              &lt;ul class=&quot;svr-list&quot;&gt;
+                ${db[key].map(it=&gt;`&lt;li&gt;${it.t} &lt;span class=&quot;car&quot;&gt;[${it.car}]&lt;/span&gt;&lt;/li&gt;`).join(&#x27;&#x27;)}
+              &lt;/ul&gt;
+            &lt;/div&gt;`).join(&#x27;&#x27;)}
+        &lt;/div&gt;`
+      : `&lt;div class=&quot;svr-pending&quot;&gt;&lt;div class=&quot;svr-pending-box&quot;&gt;Sim-vs-race debrief pending — post-race driver notes not yet added.&lt;/div&gt;&lt;/div&gt;`;
+      return `&lt;div class=&quot;fcard&quot; style=&quot;--fc:${cc}&quot;&gt;
+        &lt;div class=&quot;fcard-head&quot;&gt;
+          &lt;span class=&quot;fcard-name&quot;&gt;${t.tab}&lt;/span&gt;
+          &lt;span class=&quot;fcard-tag&quot;&gt;${t.finding}&lt;/span&gt;
+          ${db?`&lt;span class=&quot;fcard-race&quot;&gt;${db.race}&lt;/span&gt;`:&#x27;&#x27;}
+        &lt;/div&gt;
+        &lt;div class=&quot;fcard-sub&quot;&gt;${t.findingSub}&lt;/div&gt;
+        ${body}
       &lt;/div&gt;`;
-    }).join(&#x27;&#x27;)}
-  &lt;/div&gt;`;
+    }).join(&#x27;&#x27;)}`;
+  document.getElementById(&#x27;findings-body&#x27;).innerHTML = html;
+})();
+
 
 /* ===== TESTING TIMELINE ===== */
 (function(){
@@ -648,7 +763,6 @@ document.getElementById(&#x27;findings-body&#x27;).innerHTML = `
 })();
 
 /* ===== THEME TOGGLE ===== */
-const themeBtn=document.getElementById(&#x27;themeBtn&#x27;);
 function applyTheme(t){
   if(t===&#x27;light&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,&#x27;light&#x27;);
   else document.documentElement.removeAttribute(&#x27;data-theme&#x27;);
@@ -656,10 +770,6 @@ function applyTheme(t){
   if(targetChart){ targetChart.destroy(); targetChart=buildTargetChart(); }
   renderDeltaCards();
 }
-themeBtn.addEventListener(&#x27;click&#x27;,()=&gt;{
-  const isLight=document.documentElement.getAttribute(&#x27;data-theme&#x27;)===&#x27;light&#x27;;
-  applyTheme(isLight?&#x27;dark&#x27;:&#x27;light&#x27;);
-});
 /* inherit theme from parent shell if it broadcasts one */
 window.addEventListener(&#x27;message&#x27;,e=&gt;{ if(e.data&amp;&amp;e.data.type===&#x27;theme&#x27;){ applyTheme(e.data.value); } });
 &lt;/script&gt;
@@ -669,7 +779,6 @@ window.addEventListener(&#x27;message&#x27;,e=&gt;{ if(e.data&amp;&amp;e.data.ty
 <div class="track-panel" id="panel-cota" role="tabpanel" data-tab="cota"><iframe class="track-frame" data-srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
-&lt;script&gt;try{sessionStorage.setItem(&#x27;cota_auth&#x27;,&#x27;1&#x27;);}catch(e){}&lt;/script&gt;
 &lt;meta charset=&quot;UTF-8&quot;&gt;
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
 &lt;title&gt;COTA — Lap Time Analysis&lt;/title&gt;
@@ -680,7 +789,7 @@ window.addEventListener(&#x27;message&#x27;,e=&gt;{ if(e.data&amp;&amp;e.data.ty
 &lt;style&gt;
 :root{
   --bg:#0a0d12; --panel:#11151c; --panel2:#161b24; --line:#222a35; --line2:#2d3744;
-  --txt:#eef1f6; --muted:#94a1b2; --dim:#5d6b7d;
+  --txt:#eef1f6; --muted:#b8c2d0; --dim:#95a2b4;
   --accent:#e6b84f; /* gold — overall best */
   --saw:#a472e8;   /* William Sawalich — purple */
   --crews:#f0883e; /* Brent Crews — orange */
@@ -693,10 +802,19 @@ window.addEventListener(&#x27;message&#x27;,e=&gt;{ if(e.data&amp;&amp;e.data.ty
   --cond:&#x27;Barlow Condensed&#x27;,sans-serif;
   --radius:10px; --radius-sm:6px;
 }
+
+[data-theme=&quot;light&quot;]{
+  --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207;
+  --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f;
+  --gt12:#d6437e;
+}
+
 body.light{
   --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
-  --txt:#10151c; --muted:#52607e; --dim:#8492a3;
-  --accent:#b8860b; --saw:#7d4fc8; --crews:#d2691e; --jones:#c0392b; --gray:#0c9e72; --hawk:#1789a0; --koch:#c0398f; --gt12:#d6437f;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207; --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f; --gt12:#d6437f;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-variant-numeric:tabular-nums}
 html,body{height:100%}
@@ -1722,11 +1840,6 @@ function startApp(){
   const input=document.getElementById(&#x27;lockinput&#x27;);
   const btn=document.getElementById(&#x27;lockbtn&#x27;);
   const err=document.getElementById(&#x27;lockerr&#x27;);
-
-  window.addEventListener('message',function(ev){
-    if(ev.data && ev.data.type==='gototab' && ev.data.tab){ try{ activate(ev.data.tab); }catch(e){} }
-  });
-
   function reveal(){ gate.style.display=&#x27;none&#x27;; app.classList.remove(&#x27;app-hidden&#x27;); startApp(); }
   try{ if(sessionStorage.getItem(&#x27;cota_auth&#x27;)===&#x27;1&#x27;){ reveal(); return; } }catch(e){}
   function attempt(){
@@ -1738,13 +1851,23 @@ function startApp(){
   input.focus();
 })();
 &lt;/script&gt;
+
+&lt;script&gt;
+window.addEventListener(&#x27;message&#x27;,function(ev){
+  if(ev.data &amp;&amp; ev.data.type===&#x27;theme&#x27;){
+    if(ev.data.value===&#x27;light&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,&#x27;light&#x27;);
+    else document.documentElement.removeAttribute(&#x27;data-theme&#x27;);
+    try{ if(typeof rebuildCharts===&#x27;function&#x27;) rebuildCharts(); }catch(e){}
+  }
+});
+&lt;/script&gt;
+
 &lt;/body&gt;
 &lt;/html&gt;
 " title="COTA lap time analysis"></iframe></div>
     <div class="track-panel" id="panel-watkins" role="tabpanel" data-tab="watkins"><iframe class="track-frame" data-srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
-&lt;script&gt;try{sessionStorage.setItem(&#x27;wat_auth&#x27;,&#x27;1&#x27;);}catch(e){}&lt;/script&gt;
 &lt;meta charset=&quot;UTF-8&quot;&gt;
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
 &lt;title&gt;Watkins Glen — Lap Time Analysis&lt;/title&gt;
@@ -1755,7 +1878,7 @@ function startApp(){
 &lt;style&gt;
 :root{
   --bg:#0a0d12; --panel:#11151c; --panel2:#161b24; --line:#222a35; --line2:#2d3744;
-  --txt:#eef1f6; --muted:#94a1b2; --dim:#5d6b7d;
+  --txt:#eef1f6; --muted:#b8c2d0; --dim:#95a2b4;
   --accent:#e6b84f; /* gold — overall best */
   --saw:#a472e8;   /* William Sawalich — purple */
   --crews:#f0883e; /* Brent Crews — orange */
@@ -1768,10 +1891,19 @@ function startApp(){
   --cond:&#x27;Barlow Condensed&#x27;,sans-serif;
   --radius:10px; --radius-sm:6px;
 }
+
+[data-theme=&quot;light&quot;]{
+  --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207;
+  --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f;
+  --gt12:#d6437e;
+}
+
 body.light{
   --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
-  --txt:#10151c; --muted:#52607e; --dim:#8492a3;
-  --accent:#b8860b; --saw:#7d4fc8; --crews:#d2691e; --jones:#c0392b; --gray:#0c9e72; --hawk:#1789a0; --koch:#c0398f; --gt12:#d6437f;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207; --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f; --gt12:#d6437f;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-variant-numeric:tabular-nums}
 html,body{height:100%}
@@ -2686,13 +2818,23 @@ function startApp(){
   input.focus();
 })();
 &lt;/script&gt;
+
+&lt;script&gt;
+window.addEventListener(&#x27;message&#x27;,function(ev){
+  if(ev.data &amp;&amp; ev.data.type===&#x27;theme&#x27;){
+    if(ev.data.value===&#x27;light&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,&#x27;light&#x27;);
+    else document.documentElement.removeAttribute(&#x27;data-theme&#x27;);
+    try{ if(typeof rebuildCharts===&#x27;function&#x27;) rebuildCharts(); }catch(e){}
+  }
+});
+&lt;/script&gt;
+
 &lt;/body&gt;
 &lt;/html&gt;
 " title="Watkins Glen lap time analysis"></iframe></div>
     <div class="track-panel" id="panel-sandiego" role="tabpanel" data-tab="sandiego"><iframe class="track-frame" data-srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
-&lt;script&gt;try{sessionStorage.setItem(&#x27;sd_auth&#x27;,&#x27;1&#x27;);}catch(e){}&lt;/script&gt;
 &lt;meta charset=&quot;UTF-8&quot;&gt;
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
 &lt;title&gt;San Diego — Lap Time Analysis&lt;/title&gt;
@@ -2703,7 +2845,7 @@ function startApp(){
 &lt;style&gt;
 :root{
   --bg:#0a0d12; --panel:#11151c; --panel2:#161b24; --line:#222a35; --line2:#2d3744;
-  --txt:#eef1f6; --muted:#94a1b2; --dim:#5d6b7d;
+  --txt:#eef1f6; --muted:#b8c2d0; --dim:#95a2b4;
   --accent:#e6b84f; /* gold — overall best */
   --saw:#a78bfa;   /* William Sawalich — purple */
   --crews:#fb923c; /* Brent Crews — orange */
@@ -2716,10 +2858,19 @@ function startApp(){
   --cond:&#x27;Barlow Condensed&#x27;,sans-serif;
   --radius:10px; --radius-sm:6px;
 }
+
+[data-theme=&quot;light&quot;]{
+  --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207;
+  --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f;
+  --gt12:#d6437e;
+}
+
 body.light{
   --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
-  --txt:#10151c; --muted:#52607e; --dim:#8492a3;
-  --accent:#b8860b; --saw:#7d4fc8; --crews:#d2691e; --jones:#c0392b; --gray:#0c9e72; --hawk:#1789a0; --koch:#c0398f; --gt12:#d6437f;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207; --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f; --gt12:#d6437f;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-variant-numeric:tabular-nums}
 html,body{height:100%}
@@ -6418,13 +6569,23 @@ function startApp(){
   input.focus();
 })();
 &lt;/script&gt;
+
+&lt;script&gt;
+window.addEventListener(&#x27;message&#x27;,function(ev){
+  if(ev.data &amp;&amp; ev.data.type===&#x27;theme&#x27;){
+    if(ev.data.value===&#x27;light&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,&#x27;light&#x27;);
+    else document.documentElement.removeAttribute(&#x27;data-theme&#x27;);
+    try{ if(typeof rebuildCharts===&#x27;function&#x27;) rebuildCharts(); }catch(e){}
+  }
+});
+&lt;/script&gt;
+
 &lt;/body&gt;
 &lt;/html&gt;
 " title="San Diego lap time analysis"></iframe></div>
     <div class="track-panel" id="panel-sonoma" role="tabpanel" data-tab="sonoma"><iframe class="track-frame" data-srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
-&lt;script&gt;try{sessionStorage.setItem(&#x27;son_auth&#x27;,&#x27;1&#x27;);}catch(e){}&lt;/script&gt;
 &lt;meta charset=&quot;UTF-8&quot;&gt;
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
 &lt;title&gt;Sonoma — Lap Time Analysis&lt;/title&gt;
@@ -6435,7 +6596,7 @@ function startApp(){
 &lt;style&gt;
 :root{
   --bg:#0a0d12; --panel:#11151c; --panel2:#161b24; --line:#222a35; --line2:#2d3744;
-  --txt:#eef1f6; --muted:#94a1b2; --dim:#5d6b7d;
+  --txt:#eef1f6; --muted:#b8c2d0; --dim:#95a2b4;
   --accent:#e6b84f; /* gold — overall best */
   --saw:#a472e8;   /* William Sawalich — purple */
   --crews:#f0883e; /* Brent Crews — orange */
@@ -6448,10 +6609,19 @@ function startApp(){
   --cond:&#x27;Barlow Condensed&#x27;,sans-serif;
   --radius:10px; --radius-sm:6px;
 }
+
+[data-theme=&quot;light&quot;]{
+  --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207;
+  --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f;
+  --gt12:#d6437e;
+}
+
 body.light{
   --bg:#eef1f5; --panel:#ffffff; --panel2:#f5f7fa; --line:#dde3ec; --line2:#c4cedb;
-  --txt:#10151c; --muted:#52607e; --dim:#8492a3;
-  --accent:#b8860b; --saw:#7d4fc8; --crews:#d2691e; --jones:#c0392b; --gray:#0c9e72; --hawk:#1789a0; --koch:#c0398f; --gt12:#d6437f;
+  --txt:#10151c; --muted:#4a5872; --dim:#63707f;
+  --accent:#8a6207; --saw:#7d4fc8; --crews:#a54d0c; --jones:#c0392b; --gray:#097a58; --hawk:#116678; --koch:#c0398f; --gt12:#d6437f;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-variant-numeric:tabular-nums}
 html,body{height:100%}
@@ -9265,6 +9435,17 @@ function startApp(){
   input.focus();
 })();
 &lt;/script&gt;
+
+&lt;script&gt;
+window.addEventListener(&#x27;message&#x27;,function(ev){
+  if(ev.data &amp;&amp; ev.data.type===&#x27;theme&#x27;){
+    if(ev.data.value===&#x27;light&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,&#x27;light&#x27;);
+    else document.documentElement.removeAttribute(&#x27;data-theme&#x27;);
+    try{ if(typeof rebuildCharts===&#x27;function&#x27;) rebuildCharts(); }catch(e){}
+  }
+});
+&lt;/script&gt;
+
 &lt;/body&gt;
 &lt;/html&gt;
 " title="Sonoma lap time analysis"></iframe></div>
@@ -9294,10 +9475,37 @@ function startApp(){
     if(loaded.has(key)) return;
     const panel=document.querySelector('.track-panel[data-tab="'+key+'"]');
     const frame=panel.querySelector('.track-frame');
+    frame.addEventListener('load',function(){
+      try{ frame.contentWindow.postMessage({type:'theme',value:currentTheme()},'*'); }catch(e){}
+    });
     frame.srcdoc=frame.dataset.srcdoc;
     frame.removeAttribute('data-srcdoc');
     loaded.add(key);
   }
+
+  function currentTheme(){ return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'; }
+  function broadcastTheme(){
+    const v=currentTheme();
+    document.querySelectorAll('.track-frame').forEach(function(f){
+      try{ if(f.contentWindow) f.contentWindow.postMessage({type:'theme',value:v},'*'); }catch(e){}
+    });
+  }
+  function applyTheme(v){
+    if(v==='light') document.documentElement.setAttribute('data-theme','light');
+    else document.documentElement.removeAttribute('data-theme');
+    try{ localStorage.setItem('rc2026_theme',v); }catch(e){}
+    var tb=document.getElementById('themeToggle');
+    if(tb){ tb.querySelector('.tt-icon').textContent = v==='light'?'☀':'☾';
+            tb.querySelector('.tt-label').textContent = v==='light'?'Light':'Dark'; }
+    broadcastTheme();
+  }
+  (function initTheme(){
+    var saved='dark';
+    try{ saved=localStorage.getItem('rc2026_theme')||'dark'; }catch(e){}
+    applyTheme(saved);
+    var tb=document.getElementById('themeToggle');
+    if(tb) tb.addEventListener('click',function(){ applyTheme(currentTheme()==='light'?'dark':'light'); });
+  })();
 
   function activate(key){
     tabs.forEach(t=>{
